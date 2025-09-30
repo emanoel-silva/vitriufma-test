@@ -1,0 +1,85 @@
+name: vitrine_ufma
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  flutter_modular: ^6.3.2
+  mobx: ^2.3.0
+  flutter_mobx: ^2.2.0+1
+  animate_do: ^3.1.2
+  dio: ^5.4.0
+  easy_rich_text: ^2.0.0
+  flutter_screenutil: ^5.9.0
+  flutter_svg: ^2.0.9
+  local_auth: ^2.1.8
+  hive: ^2.2.3
+  intl: 0.18.1
+  path_provider: ^2.1.1
+  universal_platform: ^1.0.0+1
+  easy_debounce: ^2.0.3
+  image_picker: ^1.0.7
+  dartz: ^0.10.1
+  cached_network_image: ^3.3.0
+  firebase_core: ^2.25.4
+  firebase_storage: ^11.6.6
+  google_sign_in: ^6.2.1
+  file_picker: ^5.2.5 
+  desktop_drop: ^0.4.4
+  dotted_border: ^2.1.0
+  url_launcher: ^6.2.6
+  web: ^0.5.1
+  flutter_rating_bar: ^4.0.1
+  app_links: ^6.3.2
+  qr_flutter: ^4.1.0
+  pretty_qr_code: ^3.3.0
+  panorama_viewer: ^2.0.4
+  fl_chart: ^0.68.0
+  webview_flutter_plus: ^0.4.19
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  mobx_codegen: ^2.6.0
+  build_runner: ^2.4.7
+
+flutter:
+  uses-material-design: true
+
+
+  assets:
+    - assets/images/
+    - assets/images/books/
+    - assets/icons/
+    - assets/translation/
+    - assets/fonts/Manrope/
+
+  fonts:
+    - family: semi-bold
+      fonts:
+        - asset: assets/fonts/Manrope/Manrope-SemiBold.ttf
+    - family: extra-bold
+      fonts:
+        - asset: assets/fonts/Manrope/Manrope-ExtraBold.ttf
+    - family: extra-light
+      fonts:
+        - asset: assets/fonts/Manrope/Manrope-ExtraLight.ttf
+    - family: light
+      fonts:
+        - asset: assets/fonts/Manrope/Manrope-Light.ttf
+    - family: regular
+      fonts:
+        - asset: assets/fonts/Manrope/Manrope-Regular.ttf
+    - family: medium
+      fonts:
+        - asset: assets/fonts/Manrope/Manrope-Medium.ttf
+    - family: bold
+      fonts:
+        - asset: assets/fonts/Manrope/Manrope-Bold.ttf

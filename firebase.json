@@ -1,0 +1,22 @@
+{
+    "hosting": {
+        "public": "build/web",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+        ]
+    },
+    "flutter": {
+        "platforms": {
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "vitrine-3907d",
+                    "configurations": {
+                        "web": "1:514010377904:web:11e4f531f15c7ae28e5575"
+                    }
+                }
+            }
+        }
+    }
+}
