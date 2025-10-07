@@ -1,12 +1,10 @@
-import 'package:vitrine_ufma/app/core/constants/const.dart';
-import 'package:vitrine_ufma/app/core/store/layout/layout_store.dart';
-import 'package:vitrine_ufma/app/modules/home/presenter/widgets/side_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:vitrine_ufma/app/core/constants/const.dart';
+import 'package:vitrine_ufma/app/core/store/layout/layout_store.dart';
+import 'package:vitrine_ufma/app/modules/home/presenter/widgets/side_menu.dart';
 import 'package:vitrine_ufma/app/core/theme/them_custom.dart';
-import 'package:vitrine_ufma/app/core/components/keyboard_navigation_wrapper.dart';
-import 'package:universal_platform/universal_platform.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
@@ -41,7 +39,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<ThemeCustom>()!;
 
-    Widget content = Scaffold(
+    return Scaffold(
       backgroundColor: theme.backgroundColor,
       body: Observer(
         builder: (_) => Stack(
@@ -68,17 +66,5 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-    
-    // Wrap with keyboard navigation on web
-    if (UniversalPlatform.isWeb) {
-      return KeyboardNavigationWrapper(
-        pageKey: 'home_page',
-        enableGlobalShortcuts: true,
-        enableFocusManagement: true,
-        child: content,
-      );
-    }
-    
-    return content;
   }
 }

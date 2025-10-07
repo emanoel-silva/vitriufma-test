@@ -5,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:vitrine_ufma/app/core/components/footer.dart';
 import 'package:vitrine_ufma/app/core/components/image_asset.dart';
 import 'package:vitrine_ufma/app/core/components/text.dart';
+import 'package:vitrine_ufma/app/core/components/enhanced_keyboard_navigation.dart';
+import 'package:vitrine_ufma/app/core/components/accessible_keyboard_button.dart';
 import 'package:vitrine_ufma/app/core/constants/colors.dart';
 import 'package:vitrine_ufma/app/core/constants/const.dart';
 import 'package:vitrine_ufma/app/core/constants/fonts_sizes.dart';
@@ -26,7 +28,7 @@ class AboutUsPage extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: AppColors.backgroundGrey,
-      body: SingleChildScrollView(
+      body: EnhancedKeyboardNavigation(
         child: Column(
           children: [
             Padding(
@@ -224,14 +226,14 @@ class AboutUsPage extends StatelessWidget {
                     const AppText(
                       textAlign: TextAlign.justify,
                       text:
-                          'Fornecer suporte informacional às atividades de ensino, pesquisa e extensão da UFMA, auxiliando na geração, preservação e difusão de conhecimentos científicos, tecnológicos, culturais, e da inovação, visando ao desenvolvimento intelectual e social.',
+                          'Promover o acesso democrático à informação e ao conhecimento, contribuindo para a formação acadêmica, científica, cultural e profissional da comunidade atendida, por meio de serviços bibliotecários eficientes, de qualidade e inovadores.',
                       fontSize: AppFontSize.fz05,
                       maxLines: 10,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     const AppText(
                       textAlign: TextAlign.justify,
-                      text: 'Horário de funcionamento',
+                      text: 'Visão',
                       fontSize: AppFontSize.fz07,
                       fontWeight: 'bold',
                     ),
@@ -239,231 +241,61 @@ class AboutUsPage extends StatelessWidget {
                     const AppText(
                       textAlign: TextAlign.justify,
                       text:
-                          'Segunda-feira a sexta-feira, das 8h30min às 20h30min. ',
+                          'Ser referência em biblioteconomia e ciência da informação no estado do Maranhão, reconhecida pela qualidade dos seus serviços, pela excelência na gestão e pela valorização de seus colaboradores.',
+                      fontSize: AppFontSize.fz05,
+                      maxLines: 10,
+                    ),
+                    const SizedBox(height: 10),
+                    const AppText(
+                      textAlign: TextAlign.justify,
+                      text: 'Valores',
+                      fontSize: AppFontSize.fz07,
+                      fontWeight: 'bold',
+                    ),
+                    const SizedBox(height: 10),
+                    const AppText(
+                      textAlign: TextAlign.justify,
+                      text: '• Compromisso com a excelência;',
+                      fontSize: AppFontSize.fz05,
+                      maxLines: 10,
+                    ),
+                    const SizedBox(height: 5),
+                    const AppText(
+                      textAlign: TextAlign.justify,
+                      text: '• Valorização da diversidade;',
+                      fontSize: AppFontSize.fz05,
+                      maxLines: 10,
+                    ),
+                    const SizedBox(height: 5),
+                    const AppText(
+                      textAlign: TextAlign.justify,
+                      text: '• Inovação e atualização constante;',
+                      fontSize: AppFontSize.fz05,
+                      maxLines: 10,
+                    ),
+                    const SizedBox(height: 5),
+                    const AppText(
+                      textAlign: TextAlign.justify,
+                      text: '• Ética e transparência;',
+                      fontSize: AppFontSize.fz05,
+                      maxLines: 10,
+                    ),
+                    const SizedBox(height: 5),
+                    const AppText(
+                      textAlign: TextAlign.justify,
+                      text: '• Responsabilidade social e ambiental.',
                       fontSize: AppFontSize.fz05,
                       maxLines: 10,
                     ),
                     const SizedBox(height: 20),
-                    const AppText(
-                      textAlign: TextAlign.justify,
-                      text: 'Bibliotecários responsáveis',
-                      fontSize: AppFontSize.fz07,
-                      fontWeight: 'bold',
-                    ),
-                    const SizedBox(height: 10),
-                    const AppText(
-                      textAlign: TextAlign.justify,
-                      text:
-                          'Letycya Cristina Barbosa Vieira, Lucio Lago Lopes e Soraya Vieira de Albuquerque.',
-                      fontSize: AppFontSize.fz05,
-                      maxLines: 10,
-                    ),
-                    const SizedBox(height: 20),
-                    const AppText(
-                      textAlign: TextAlign.justify,
-                      text: 'Serviços oferecidos',
-                      fontSize: AppFontSize.fz07,
-                      fontWeight: 'bold',
-                    ),
-                    const SizedBox(height: 10),
-                    const AppText(
-                      text:
-                          '''-      Empréstimo e devolução do material bibliográfico;
-      -      Renovação on-line;
-      -      Catálogo on-line;
-      -      Reserva do material bibliográfico;
-      -      Orientação à Normalização de Trabalhos Acadêmicos;
-      -      Levantamento bibliográfico;
-      -      Elaboração de ficha catalográfica para livros;
-      -      Geração de ficha catalográfica on-line;
-      -      Treinamento de usuários no uso de fontes eletrônicas, bases de dados e Portal da 
-          Capes;
-      -      Visitas orientadas;
-      -      Acesso Wi-fi.''',
-                      fontSize: AppFontSize.fz05,
-                      maxLines: 10,
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        InkWell(
-                          onTap: () async {
-                            if (!await launchUrl(Uri.parse(
-                                'https://portais.ufma.br/PortalUnidade/dib/paginas/pagina_estatica.jsf?id=718'))) {
-                              throw Exception('Could not launch');
-                            }
-                          },
-                          child: const AppText(
-                            textAlign: TextAlign.justify,
-                            text: '“Saiba mais”',
-                            color: AppColors.blueLink,
-                            fontSize: AppFontSize.fz05,
-                            maxLines: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    const AppText(
-                      textAlign: TextAlign.justify,
-                      text: 'Canais de comunicação',
-                      fontSize: AppFontSize.fz07,
-                      fontWeight: 'bold',
-                    ),
-                    const SizedBox(height: 10),
-                    const AppText(
-                      textAlign: TextAlign.justify,
-                      text: 'Telefone: (98) 3272-9787',
-                      fontSize: AppFontSize.fz05,
-                    ),
-                    const AppText(
-                      // textAlign: TextAlign.justify,
-                      text: '''E-mail: biblioteca.pinheiro@ufma.br
-                  biblioteca.pho@ufma.br''',
-                      fontSize: AppFontSize.fz05,
-                    ),
-                    const SizedBox(height: 20),
-
-                    const AppText(
-                      textAlign: TextAlign.justify,
-                      text: 'Redes sociais',
-                      fontSize: AppFontSize.fz07,
-                      fontWeight: 'bold',
-                    ),
-                    const SizedBox(height: 10),
-                    InkWell(
-                      onTap: () async {
-                        if (!await launchUrl(
-                            Uri.parse('https://www.youtube.com/@ufmadib'))) {
-                          throw Exception('Could not launch');
-                        }
-                        // https://www.instagram.com/bibliotecapinheiro/
+                    AccessibleKeyboardButton(
+                      onPressed: () {
+                        Modular.to.navigate('/home/books');
                       },
-                      child: const Row(
-                        children: [
-                          AppImageAsset(
-                            image: 'youtube_logo.png',
-                            imageH: 10,
-                          ),
-                          SizedBox(width: 5),
-                          AppText(text: '@ufmadib')
-                        ],
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        if (!await launchUrl(Uri.parse(
-                            'https://www.youtube.com/@ufmacampuspinheiro'))) {
-                          throw Exception('Could not launch');
-                        }
-                        // https://www.instagram.com/bibliotecapinheiro/
-                      },
-                      child: const Row(
-                        children: [
-                          AppImageAsset(
-                            image: 'youtube_logo.png',
-                            imageH: 10,
-                          ),
-                          SizedBox(width: 5),
-                          AppText(text: '@ufmacampuspinheiro')
-                        ],
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        if (!await launchUrl(
-                            Uri.parse('https://www.instagram.com/ufma_dib/'))) {
-                          throw Exception('Could not launch');
-                        }
-                        // https://www.instagram.com/bibliotecapinheiro/
-                      },
-                      child: const Row(
-                        children: [
-                          AppImageAsset(
-                            image: 'instagram.png',
-                            imageH: 10,
-                          ),
-                          SizedBox(width: 5),
-                          AppText(text: '@ufma_dib')
-                        ],
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        if (!await launchUrl(Uri.parse(
-                            'https://www.instagram.com/ufmacampuspinheiro/'))) {
-                          throw Exception('Could not launch');
-                        }
-                        // https://www.instagram.com/bibliotecapinheiro/
-                      },
-                      child: const Row(
-                        children: [
-                          AppImageAsset(
-                            image: 'instagram.png',
-                            imageH: 10,
-                          ),
-                          SizedBox(width: 5),
-                          AppText(text: '@ufmacampuspinheiro')
-                        ],
-                      ),
+                      semanticsLabel: 'Voltar para a página inicial',
+                      child: const Text('Voltar'),
                     ),
                     const SizedBox(height: 20),
-                    const AppText(
-                      textAlign: TextAlign.justify,
-                      text: 'Localização',
-                      fontSize: AppFontSize.fz07,
-                      fontWeight: 'bold',
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        const AppText(
-                          textAlign: TextAlign.justify,
-                          text: 'Endereço: ',
-                          fontSize: AppFontSize.fz05,
-                          maxLines: 10,
-                        ),
-                        InkWell(
-                          onTap: () async {
-                            if (!await launchUrl(Uri.parse(
-                                'https://maps.app.goo.gl/y4XZ2TXUTLzpcLJBA'))) {
-                              throw Exception('Could not launch');
-                            }
-                          },
-                          child: AppText(
-                            textAlign: TextAlign.justify,
-                            text:
-                                'Rua Nelma Mitoso, s.n., Bairro Ribeirão Sítio. Pinheiro-MA. CEP: 65200-000.',
-                            fontSize: AppFontSize.fz05,
-                            color: AppColors.blueLink,
-                            maxLines: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    const AppText(
-                      textAlign: TextAlign.justify,
-                      text: 'Biblioteca',
-                      fontSize: AppFontSize.fz07,
-                      fontWeight: 'bold',
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                        width: 400,
-                        height: 200,
-                        child: PanoramaViewer(
-                          child: Image.asset(
-                              'assets/images/example-ps-scaled.jpg'),
-                        ))
-                    // //https://maps.app.goo.gl/y4XZ2TXUTLzpcLJBA
-                    // const AppText(
-                    //   textAlign: TextAlign.justify,
-                    //   text: 'Mapa do Google com  a localização da Biblioteca',
-                    //   fontSize: AppFontSize.fz05,
-                    //   maxLines: 10,
-                    // ),
                   ]),
             ),
             const SizedBox(height: 100),

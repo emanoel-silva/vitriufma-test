@@ -25,7 +25,19 @@ abstract class _ManageStoreBase with Store {
   ObservableList<Book> bestRatedBooks = <Book>[].asObservable();
 
   @observable
+  ObservableMap<int, int> bookAccessCounts = <int, int>{}.asObservable();
+
+  @observable
+  ObservableMap<int, double> bookRatings = <int, double>{}.asObservable();
+
+  @observable
   int totalAccessCount = 0;
+
+  @observable
+  int totalBooksCount = 0;
+
+  @observable
+  ObservableList<int> weeklyAccessData = <int>[].asObservable();
   //SETAR PERMISSÃO
   @action
   Future<void> setPermission(
@@ -79,6 +91,8 @@ abstract class _ManageStoreBase with Store {
         _loadMostAccessedBooks(),
         _loadBestRatedBooks(),
         _loadTotalAccessCount(),
+        _loadTotalBooksCount(),
+        _loadWeeklyAccessData(),
       ]);
     } catch (e) {
       debugPrint("Error loading reports data: $e");
@@ -96,12 +110,17 @@ abstract class _ManageStoreBase with Store {
       debugPrint("Error loading most accessed materials: $l");
     }, (r) async {
       mostAccessedBooks.clear();
+      bookAccessCounts.clear();
+      
       for (var id in r) {
         final bookResult = await infoMaterialUsecase.getDetailInfoMaterial(id);
         bookResult.fold((l) {
           debugPrint("Error loading book details: $l");
         }, (bookData) {
-          mostAccessedBooks.add(Book.fromJson(Map<String, dynamic>.from(bookData)));
+          final book = Book.fromJson(Map<String, dynamic>.from(bookData));
+          mostAccessedBooks.add(book);
+          // Simular contagem de acessos para cada livro (seria vindo da API)
+          bookAccessCounts[book.id] = (100 - r.indexOf(id) * 10).clamp(10, 100);
         });
       }
     });
@@ -109,38 +128,24 @@ abstract class _ManageStoreBase with Store {
 
   @action
   Future<void> _loadBestRatedBooks() async {
-    // Como não há um método específico para buscar os melhores avaliados,
-    // vamos buscar todos os materiais e ordenar por rating localmente
-    final result = await infoMaterialUsecase.call();
+    final result = await infoMaterialUsecase.getTopRatedMaterials(10);
     
     result.fold((l) {
-      debugPrint("Error loading materials for rating: $l");
+      debugPrint("Error loading top rated materials: $l");
     }, (r) async {
-      List<Book> allBooks = [];
+      bestRatedBooks.clear();
       
-      // Limitar a busca para melhor performance
-      final limitedList = r.take(50).toList();
-      
-      for (var item in limitedList) {
-        final bookResult = await infoMaterialUsecase.getDetailInfoMaterial(item['id']);
+      for (var id in r) {
+        final bookResult = await infoMaterialUsecase.getDetailInfoMaterial(id);
         bookResult.fold((l) {
           debugPrint("Error loading book details: $l");
         }, (bookData) {
           final book = Book.fromJson(Map<String, dynamic>.from(bookData));
-          allBooks.add(book);
+          bestRatedBooks.add(book);
+          // Simular avaliação para cada livro (seria vindo da API)
+          bookRatings[book.id] = (5.0 - (r.indexOf(id) * 0.3)).clamp(3.0, 5.0);
         });
       }
-      
-      // Ordenar por rating (assumindo que existe um campo rating no Book)
-      // Se não existir, podemos usar um valor padrão ou outra métrica
-      allBooks.sort((a, b) {
-        // Como pode não haver campo rating diretamente, vamos usar uma lógica alternativa
-        // Por enquanto, vamos usar o número de autores como proxy (pode ser ajustado)
-        return b.author.length.compareTo(a.author.length);
-      });
-      
-      bestRatedBooks.clear();
-      bestRatedBooks.addAll(allBooks.take(10));
     });
   }
 
@@ -156,5 +161,23 @@ abstract class _ManageStoreBase with Store {
       // Simular contagem total de acessos
       totalAccessCount = r.length * 15; // Multiplicador simulado
     });
+  }
+
+  @action
+  Future<void> _loadTotalBooksCount() async {
+    final result = await infoMaterialUsecase.call();
+    
+    result.fold((l) {
+      debugPrint("Error loading total books count: $l");
+    }, (r) {
+      totalBooksCount = r.length;
+    });
+  }
+
+  @action
+  Future<void> _loadWeeklyAccessData() async {
+    // Simular dados de acesso semanal (em um sistema real, viria da API)
+    weeklyAccessData.clear();
+    weeklyAccessData.addAll([45, 52, 38, 67, 82, 95, 78]);
   }
 }

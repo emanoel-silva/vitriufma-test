@@ -15,14 +15,13 @@ class ManagePage extends StatefulWidget {
 }
 
 class _ManagePageState extends State<ManagePage> {
-  late ManageStore store;
+  final ManageStore store = Modular.get<ManageStore>();
   final LayoutStore layoutStore = Modular.get<LayoutStore>();
 
   @override
   void initState() {
     super.initState();
-    store = Modular.get<ManageStore>();
-    // Carregar dados dos relatórios
+       // Carregar dados dos relatórios
     WidgetsBinding.instance.addPostFrameCallback((_) {
       store.loadReportsData();
     });
@@ -363,16 +362,16 @@ class _ManagePageState extends State<ManagePage> {
                 Colors.blue,
               ),
             ),
-            const SizedBox(width: 20),
+            const SizedBox(width: 15),
             Expanded(
               child: _buildStatCard(
                 "Livros Cadastrados",
-                store.mostAccessedBooks.length.toString(),
+                store.totalBooksCount.toString(),
                 Icons.book,
                 Colors.green,
               ),
             ),
-            const SizedBox(width: 20),
+            const SizedBox(width: 15),
             Expanded(
               child: _buildStatCard(
                 "Mais Acessados",
@@ -381,25 +380,41 @@ class _ManagePageState extends State<ManagePage> {
                 Colors.orange,
               ),
             ),
+            const SizedBox(width: 15),
+            Expanded(
+              child: _buildStatCard(
+                "Melhores Avaliados",
+                store.bestRatedBooks.length.toString(),
+                Icons.star,
+                Colors.amber,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 30),
         
-        // Gráficos
+        // Gráficos e listas
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Gráfico de livros mais acessados
             Expanded(
+              flex: 3,
               child: _buildMostAccessedChart(),
             ),
             const SizedBox(width: 20),
-            // Gráfico de melhores avaliados
+            // Lista de melhores avaliados
             Expanded(
-              child: _buildBestRatedChart(),
+              flex: 2,
+              child: _buildBestRatedList(),
             ),
           ],
         ),
+        
+        const SizedBox(height: 30),
+        
+        // Seção de acessos por período
+        _buildAccessTrendsChart(),
       ],
     );
   }
@@ -484,8 +499,35 @@ class _ManagePageState extends State<ManagePage> {
                 : BarChart(
                     BarChartData(
                       alignment: BarChartAlignment.spaceAround,
-                      maxY: 100,
-                      barTouchData: BarTouchData(enabled: false),
+                      maxY: store.bookAccessCounts.values.isNotEmpty 
+                          ? store.bookAccessCounts.values.reduce((a, b) => a > b ? a : b).toDouble() + 20
+                          : 100,
+                      barTouchData: BarTouchData(
+                        enabled: true,
+                        touchTooltipData: BarTouchTooltipData(
+                          getTooltipColor: (group) => Colors.blueGrey,
+                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                            final book = store.mostAccessedBooks[group.x.toInt()];
+                            return BarTooltipItem(
+                              '${book.title}\n',
+                              const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: '${rod.toY.round()} acessos',
+                                  style: const TextStyle(
+                                    color: Colors.yellow,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
                       titlesData: FlTitlesData(
                         show: true,
                         bottomTitles: AxisTitles(
@@ -523,19 +565,29 @@ class _ManagePageState extends State<ManagePage> {
                       ),
                       borderData: FlBorderData(show: false),
                       barGroups: store.mostAccessedBooks
-                          .take(5)
+                          .take(6)
                           .toList()
                           .asMap()
                           .entries
                           .map((entry) {
+                        final book = entry.value;
+                        final accessCount = store.bookAccessCounts[book.id] ?? 0;
                         return BarChartGroupData(
                           x: entry.key,
                           barRods: [
                             BarChartRodData(
-                              toY: (entry.key + 1) * 15.0, // Valor simulado
-                              color: Colors.blue,
-                              width: 16,
+                              toY: accessCount.toDouble(),
+                              color: Colors.blue.withOpacity(0.8),
+                              width: 20,
                               borderRadius: BorderRadius.circular(4),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.blue.withOpacity(0.8),
+                                  Colors.blue.withOpacity(0.4),
+                                ],
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                              ),
                             ),
                           ],
                         );
@@ -548,7 +600,7 @@ class _ManagePageState extends State<ManagePage> {
     );
   }
 
-  Widget _buildBestRatedChart() {
+  Widget _buildBestRatedList() {
     return Container(
       height: 300,
       padding: const EdgeInsets.all(20),
@@ -568,12 +620,12 @@ class _ManagePageState extends State<ManagePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const AppText(
-            text: "Livros Melhores Avaliados",
+            text: "Melhores Avaliados",
             fontSize: 16,
             fontWeight: 'bold',
             color: Colors.black,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 15),
           Expanded(
             child: store.bestRatedBooks.isEmpty
                 ? const Center(
@@ -583,78 +635,257 @@ class _ManagePageState extends State<ManagePage> {
                       color: Colors.grey,
                     ),
                   )
-                : PieChart(
-                    PieChartData(
-                      sections: store.bestRatedBooks
-                          .take(5)
-                          .toList()
-                          .asMap()
-                          .entries
-                          .map((entry) {
-                        final colors = [
-                          Colors.orange,
-                          Colors.green,
-                          Colors.red,
-                          Colors.purple,
-                          Colors.teal,
-                        ];
-                        return PieChartSectionData(
-                          color: colors[entry.key % colors.length],
-                          value: (5 - entry.key).toDouble(),
-                          title: '${5 - entry.key}⭐',
-                          radius: 50,
-                          titleStyle: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        );
-                      }).toList(),
-                      centerSpaceRadius: 40,
-                      sectionsSpace: 2,
-                    ),
+                : ListView.builder(
+                    itemCount: store.bestRatedBooks.length,
+                    itemBuilder: (context, index) {
+                      final book = store.bestRatedBooks[index];
+                      final rating = store.bookRatings[book.id] ?? 0.0;
+                      
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey[200]!),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    color: _getRankColor(index),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: AppText(
+                                      text: '${index + 1}',
+                                      fontSize: 12,
+                                      fontWeight: 'bold',
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: AppText(
+                                    text: book.title.length > 30 
+                                        ? '${book.title.substring(0, 30)}...'
+                                        : book.title,
+                                    fontSize: 13,
+                                    fontWeight: 'medium',
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                ...List.generate(5, (starIndex) {
+                                  return Icon(
+                                    Icons.star,
+                                    size: 14,
+                                    color: starIndex < rating.floor()
+                                        ? Colors.amber
+                                        : Colors.grey[300],
+                                  );
+                                }),
+                                const SizedBox(width: 8),
+                                AppText(
+                                  text: rating.toStringAsFixed(1),
+                                  fontSize: 12,
+                                  fontWeight: 'medium',
+                                  color: Colors.grey[600]!,
+                                ),
+                              ],
+                            ),
+                            if (book.author.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              AppText(
+                                text: 'Por: ${book.author.first}',
+                                fontSize: 11,
+                                color: Colors.grey[500]!,
+                              ),
+                            ],
+                          ],
+                        ),
+                      );
+                    },
                   ),
           ),
-          if (store.bestRatedBooks.isNotEmpty)
-            Column(
-              children: store.bestRatedBooks
-                  .take(3)
-                  .toList()
-                  .asMap()
-                  .entries
-                  .map((entry) {
-                final book = entry.value;
-                final colors = [Colors.orange, Colors.green, Colors.red];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 12,
-                        height: 12,
-                        decoration: BoxDecoration(
-                          color: colors[entry.key],
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: AppText(
-                          text: book.title.length > 25 
-                              ? '${book.title.substring(0, 25)}...'
-                              : book.title,
-                          fontSize: 10,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
         ],
       ),
     );
+  }
+
+  Widget _buildAccessTrendsChart() {
+    return Container(
+      height: 300,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const AppText(
+            text: "Tendência de Acessos nos Últimos 7 Dias",
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: Colors.black,
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(
+                  show: true,
+                  drawHorizontalLine: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: 20,
+                  getDrawingHorizontalLine: (value) {
+                    return FlLine(
+                      color: Colors.grey[300]!,
+                      strokeWidth: 1,
+                    );
+                  },
+                ),
+                titlesData: FlTitlesData(
+                  show: true,
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 30,
+                      interval: 1,
+                      getTitlesWidget: (double value, TitleMeta meta) {
+                        const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+                        if (value.toInt() >= 0 && value.toInt() < days.length) {
+                          return Text(
+                            days[value.toInt()],
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          );
+                        }
+                        return const Text('');
+                      },
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 20,
+                      getTitlesWidget: (double value, TitleMeta meta) {
+                        return Text(
+                          value.toInt().toString(),
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        );
+                      },
+                      reservedSize: 32,
+                    ),
+                  ),
+                ),
+                borderData: FlBorderData(
+                  show: true,
+                  border: Border.all(color: Colors.grey[300]!, width: 1),
+                ),
+                minX: 0,
+                maxX: 6,
+                minY: 0,
+                maxY: 120,
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: store.weeklyAccessData.isNotEmpty
+                        ? store.weeklyAccessData.asMap().entries
+                            .map((entry) => FlSpot(
+                                  entry.key.toDouble(),
+                                  entry.value.toDouble(),
+                                ))
+                            .toList()
+                        : [
+                            const FlSpot(0, 45),
+                            const FlSpot(1, 52),
+                            const FlSpot(2, 38),
+                            const FlSpot(3, 67),
+                            const FlSpot(4, 82),
+                            const FlSpot(5, 95),
+                            const FlSpot(6, 78),
+                          ],
+                    isCurved: true,
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.green.withOpacity(0.8),
+                        Colors.green.withOpacity(0.3),
+                      ],
+                    ),
+                    barWidth: 3,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) =>
+                        FlDotCirclePainter(
+                          radius: 4,
+                          color: Colors.green,
+                          strokeWidth: 2,
+                          strokeColor: Colors.white,
+                        ),
+                    ),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.green.withOpacity(0.3),
+                          Colors.green.withOpacity(0.05),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getRankColor(int index) {
+    const colors = [
+      Colors.amber,     // 1º lugar - dourado
+      Colors.grey,      // 2º lugar - prata  
+      Colors.orange,    // 3º lugar - bronze
+      Colors.blue,      // demais posições
+      Colors.green,
+    ];
+    return colors[index < colors.length ? index : colors.length - 1];
   }
 
   Widget _backButton() {

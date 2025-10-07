@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:vitrine_ufma/app/core/components/footer.dart';
 import 'package:vitrine_ufma/app/core/components/text.dart';
 import 'package:vitrine_ufma/app/core/components/text_widget.dart';
+import 'package:vitrine_ufma/app/core/components/enhanced_keyboard_navigation.dart';
 import 'package:vitrine_ufma/app/core/constants/colors.dart';
 import 'package:vitrine_ufma/app/core/constants/const.dart';
 import 'package:vitrine_ufma/app/core/constants/fonts_sizes.dart';
@@ -24,7 +25,7 @@ class HelpPage extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: AppColors.backgroundGrey,
-      body: SingleChildScrollView(
+      body: EnhancedKeyboardNavigation(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

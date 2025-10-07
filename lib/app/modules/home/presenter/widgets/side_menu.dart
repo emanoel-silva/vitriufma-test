@@ -7,12 +7,10 @@ import 'package:vitrine_ufma/app/core/store/auth/auth_store.dart';
 import 'package:vitrine_ufma/app/core/theme/them_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:vitrine_ufma/app/core/utils/screen_helper.dart';
 import 'package:vitrine_ufma/app/modules/auth/domain/usecases/logout_usecase.dart';
 import 'package:vitrine_ufma/app/core/components/vlibras_clickable_text.dart';
 import 'package:universal_platform/universal_platform.dart';
-import 'package:vitrine_ufma/app/core/components/keyboard_accessible_components.dart';
-import 'package:vitrine_ufma/app/core/services/focus_management_service.dart';
-import 'package:flutter/services.dart';
 
 class SideMenu extends StatefulWidget {
   const SideMenu({
@@ -29,25 +27,11 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
   late Map boxData;
   late bool isLogged = false;
   String currentPath = '';
-  
-  // Keyboard navigation support
-  final FocusManagementService _focusService = FocusManagementService();
-  final List<FocusNode> _menuFocusNodes = [];
-  late FocusNode _fontSizeFocusNode;
-  late FocusNode _homeFocusNode;
-  late FocusNode _aboutFocusNode;
-  late FocusNode _accessibilityFocusNode;
-  late FocusNode _helpFocusNode;
-  late FocusNode _loginFocusNode;
-  late FocusNode _profileFocusNode;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize focus nodes
-    _initializeFocusNodes();
-    
     checkLogin();
 
     currentPath = Modular.to.path;
@@ -58,11 +42,6 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
         });
       }
     });
-    
-    // Setup keyboard navigation
-    if (UniversalPlatform.isWeb) {
-      _setupKeyboardNavigation();
-    }
   }
 
   void checkLogin() {
@@ -71,40 +50,6 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
     setState(() {
       isLogged = ((boxData["id"] ?? '')).isNotEmpty;
     });
-  }
-  
-  void _initializeFocusNodes() {
-    _fontSizeFocusNode = FocusNode();
-    _homeFocusNode = FocusNode();
-    _aboutFocusNode = FocusNode();
-    _accessibilityFocusNode = FocusNode();
-    _helpFocusNode = FocusNode();
-    _loginFocusNode = FocusNode();
-    _profileFocusNode = FocusNode();
-    
-    _menuFocusNodes.addAll([
-      _fontSizeFocusNode,
-      _homeFocusNode,
-      _aboutFocusNode,
-      _accessibilityFocusNode,
-      _helpFocusNode,
-      if (!isLogged) _loginFocusNode else _profileFocusNode,
-    ]);
-  }
-  
-  void _setupKeyboardNavigation() {
-    _focusService.initializePage('side_menu');
-    _focusService.registerPageFocusNodes('side_menu', _menuFocusNodes);
-  }
-  
-  @override
-  void dispose() {
-    // Dispose focus nodes
-    for (final node in _menuFocusNodes) {
-      node.dispose();
-    }
-    _focusService.disposePage('side_menu');
-    super.dispose();
   }
 
   bool isRouteSelected(String route) {
@@ -164,74 +109,59 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
                 },
               );
             },
-            focusNode: _fontSizeFocusNode,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                border: _fontSizeFocusNode.hasFocus 
-                  ? Border.all(color: Theme.of(context).primaryColor, width: 2)
-                  : null,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const AppText(
-                text: "A+|A-",
-                fontSize: 16,
-                fontWeight: 'bold',
-                color: Colors.black,
-              ),
+            child: const AppText(
+              text: "A+|A-",
+              fontSize: 16,
+              fontWeight: 'bold',
+              color: Colors.black,
             ),
           ),
           const SizedBox(width: 20),
-          _buildKeyboardAccessibleMenuItem(
+          _buildMenuItem(
             context: context,
             icon: Icons.dashboard_outlined,
             title: 'Início',
             route: '/home/books',
             isSelected: isRouteSelected('/books'),
-            focusNode: _homeFocusNode,
           ),
           const SizedBox(width: 20),
-          _buildKeyboardAccessibleMenuItem(
+          _buildMenuItem(
             context: context,
             icon: Icons.dashboard_outlined,
             title: 'Sobre',
             route: '/home/about',
             isSelected: isRouteSelected('/about'),
-            focusNode: _aboutFocusNode,
           ),
           const SizedBox(
             width: 20,
           ),
-          _buildKeyboardAccessibleMenuItem(
+          _buildMenuItem(
             context: context,
             icon: Icons.task_outlined,
             title: 'Acessibilidade',
             route: '/home/acessibilities',
             isSelected: isRouteSelected('/acessibilities'),
-            focusNode: _accessibilityFocusNode,
           ),
           const SizedBox(
             width: 20,
           ),
-          _buildKeyboardAccessibleMenuItem(
+          _buildMenuItem(
             context: context,
             icon: Icons.inventory_2_outlined,
             title: 'Ajuda',
             route: '/home/help',
             isSelected: isRouteSelected('/help'),
-            focusNode: _helpFocusNode,
           ),
           const SizedBox(
             width: 20,
           ),
           if (!isLogged)
-            _buildKeyboardAccessibleMenuItem(
+            _buildMenuItem(
               context: context,
               icon: Icons.request_page_outlined,
               title: 'Login',
               route: '/auth',
               isSelected: isRouteSelected('/profile'),
-              focusNode: _loginFocusNode,
             ),
           if (isLogged)
             SizedBox(
@@ -441,57 +371,6 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
           color: theme.textColor,
           decoration:
               isSelected ? TextDecoration.underline : TextDecoration.none,
-        ),
-      ),
-    );
-  }
-  
-  Widget _buildKeyboardAccessibleMenuItem({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    required String route,
-    required bool isSelected,
-    required FocusNode focusNode,
-  }) {
-    final theme = Theme.of(context).extension<ThemeCustom>()!;
-    return Focus(
-      focusNode: focusNode,
-      onKeyEvent: (node, event) {
-        if (event is KeyDownEvent && 
-            (event.logicalKey == LogicalKeyboardKey.enter ||
-             event.logicalKey == LogicalKeyboardKey.space)) {
-          Modular.to.navigate(route);
-          return KeyEventResult.handled;
-        }
-        return KeyEventResult.ignored;
-      },
-      child: InkWell(
-        hoverColor: Colors.transparent,
-        focusColor: Colors.transparent,
-        splashColor: Colors.transparent,
-        onTap: () => Modular.to.navigate(route),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            border: focusNode.hasFocus 
-              ? Border.all(color: Theme.of(context).primaryColor, width: 2)
-              : null,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: KeyboardAccessibleText(
-            text: title,
-            style: TextStyle(
-              fontSize: AppFontSize.fz06,
-              fontWeight: FontWeight.bold,
-              color: theme.textColor,
-              decoration: isSelected ? TextDecoration.underline : TextDecoration.none,
-            ),
-            onPressed: () => Modular.to.navigate(route),
-            semanticsLabel: 'Navegar para $title',
-            tooltip: 'Clique para ir para $title',
-            focusNode: focusNode,
-          ),
         ),
       ),
     );

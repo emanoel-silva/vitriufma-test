@@ -113,7 +113,7 @@ class VLibrasClickableWrapper extends StatelessWidget {
     this.padding,
     this.highlightColor,
     this.tooltip,
-    this.showFeedback = true,
+    this.showFeedback = false, // Changed default to false to disable notifications
   }) : super(key: key);
 
   @override
@@ -143,40 +143,43 @@ class VLibrasClickableWrapper extends StatelessWidget {
       if (VLibrasHelper.isAvailable) {
         VLibrasHelper.activateAndTranslate(textToTranslate);
         
-        if (showFeedback) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Texto enviado para tradução em Libras'),
-              duration: Duration(seconds: 2),
-              backgroundColor: Colors.blue,
-            ),
-          );
-        }
+        // Removed the SnackBar notifications to stop notifying when VLibras is available
+        // if (showFeedback) {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     SnackBar(
+        //       content: Text('Texto enviado para tradução em Libras'),
+        //       duration: Duration(seconds: 2),
+        //       backgroundColor: Colors.blue,
+        //     ),
+        //   );
+        // }
       } else {
         VLibrasHelper.createTranslationArea(textToTranslate);
         
-        if (showFeedback) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('VLibras não disponível'),
-              duration: Duration(seconds: 2),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
+        // Removed the SnackBar notifications for when VLibras is not available
+        // if (showFeedback) {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     SnackBar(
+        //       content: Text('VLibras não disponível'),
+        //       duration: Duration(seconds: 2),
+        //       backgroundColor: Colors.orange,
+        //     ),
+        //   );
+        // }
       }
     } catch (e) {
       print('Erro ao processar hover para VLibras: $e');
       
-      if (showFeedback) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao enviar para VLibras'),
-            duration: Duration(seconds: 2),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      // Removed error notifications
+      // if (showFeedback) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text('Erro ao enviar para VLibras'),
+      //       duration: Duration(seconds: 2),
+      //       backgroundColor: Colors.red,
+      //     ),
+      //   );
+      // }
     }
   }
 }

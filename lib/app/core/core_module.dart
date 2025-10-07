@@ -6,8 +6,6 @@ import 'package:vitrine_ufma/app/core/service/local_file/file_access.dart';
 import 'package:vitrine_ufma/app/core/service/local_file/i_file_access.dart';
 import 'package:vitrine_ufma/app/core/service/local_storage/i_local_storage.dart';
 import 'package:vitrine_ufma/app/core/service/local_storage/local_storage_hive_impl.dart';
-import 'package:vitrine_ufma/app/core/services/keyboard_navigation_service.dart';
-import 'package:vitrine_ufma/app/core/services/focus_management_service.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:local_auth/local_auth.dart';
@@ -22,11 +20,6 @@ class CoreModule extends Module {
     i.add<IFileAccess>(FileAccess.new);
     i.addSingleton<IClientHttp>(ClientHttpDioImpl.new);
     i.addSingleton<ILocalStorage>(LocalStorageHiveImpl.new);
-    
-    // Accessibility and keyboard navigation services
-    i.addSingleton<KeyboardNavigationService>(KeyboardNavigationService.new);
-    i.addSingleton<FocusManagementService>(FocusManagementService.new);
-    
     i.addInstance(GoogleSignIn(
         scopes: ['email', 'profile', 'openid'],
         clientId:

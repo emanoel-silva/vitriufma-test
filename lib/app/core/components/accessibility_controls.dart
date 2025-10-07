@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
-import 'package:vitrine_ufma/app/core/components/keyboard_accessible_components.dart';
-import 'package:vitrine_ufma/app/core/services/keyboard_navigation_service.dart';
-import 'package:flutter/services.dart';
 
 // Import condicional do VLibras helper
 import '../utils/vlibras_helper_stub.dart' if (dart.library.html) '../utils/vlibras_helper.dart';
@@ -27,20 +24,14 @@ class AccessibilityControls extends StatefulWidget {
 }
 
 class _AccessibilityControlsState extends State<AccessibilityControls> {
-  final KeyboardNavigationService _keyboardService = KeyboardNavigationService();
-  late FocusNode _vlibrasButtonFocusNode;
-  
   @override
   void initState() {
     super.initState();
-    
-    _vlibrasButtonFocusNode = FocusNode();
     
     // Inicializa VLibras após o widget ser montado
     if (UniversalPlatform.isWeb) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         VLibrasHelper.reinitialize();
-        _keyboardService.initialize();
       });
     }
   }
@@ -63,31 +54,23 @@ class _AccessibilityControlsState extends State<AccessibilityControls> {
   }
 
   Widget _buildCustomVLibrasButton() {
-    return KeyboardAccessibleButton(
+    return FloatingActionButton(
       onPressed: () {
         VLibrasHelper.toggle();
       },
-      semanticsLabel: 'Ativar ou desativar VLibras - Tradução em Libras',
-      tooltip: 'Ativar/Desativar VLibras (Tradução em Libras)',
-      focusNode: _vlibrasButtonFocusNode,
-      focusName: 'vlibras_button',
-      style: ElevatedButton.styleFrom(
-        backgroundColor: widget.buttonColor ?? Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-        shape: const CircleBorder(),
-        padding: EdgeInsets.all(widget.buttonSize! * 0.3),
-      ),
+      backgroundColor: widget.buttonColor ?? Theme.of(context).primaryColor,
       child: Icon(
         Icons.accessibility_new,
         color: Colors.white,
-        size: widget.buttonSize! * 0.4,
       ),
+      heroTag: "vlibras_button", // Evita conflitos se houver múltiplos FABs
+      tooltip: 'Ativar/Desativar VLibras (Tradução em Libras)',
     );
   }
 
   @override
   void dispose() {
-    _vlibrasButtonFocusNode.dispose();
+    // Cleanup se necessário
     super.dispose();
   }
 }
