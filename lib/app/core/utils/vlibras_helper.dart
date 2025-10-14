@@ -349,49 +349,59 @@ class VLibrasHelper {
         ..setAttribute('id', 'vlibras-translation-area')
         ..setAttribute('lang', 'pt-BR')
         ..style.position = 'fixed'
-        ..style.top = '10px'
-        ..style.right = '10px'
-        ..style.width = '300px'
-        ..style.maxHeight = '200px'
+        ..style.bottom = '20px'
+        ..style.right = '20px'
+        ..style.width = '210px'
+        ..style.height = '80px'  // Fixed height instead of auto/min-height
         ..style.backgroundColor = 'rgba(255, 255, 255, 0.95)'
         ..style.border = '2px solid #0066cc'
         ..style.borderRadius = '8px'
-        ..style.padding = '15px'
+        ..style.padding = '16px'
         ..style.zIndex = '10000'
-        ..style.fontSize = '16px'
-        ..style.lineHeight = '1.4'
+        ..style.fontSize = '14px'
+        ..style.lineHeight = '1.3'
         ..style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'
-        ..style.overflow = 'auto';
+        ..style.overflow = 'hidden'
+        ..style.display = 'flex'
+        ..style.flexDirection = 'column';
       
       // Cria conteúdo da área
       final header = html.DivElement()
         ..style.display = 'flex'
         ..style.justifyContent = 'space-between'
         ..style.alignItems = 'center'
-        ..style.marginBottom = '10px';
+        ..style.marginBottom = '4px'
+        ..style.flexShrink = '0';
       
       final title = html.Element.tag('strong')
         ..style.color = '#0066cc'
+        ..style.fontSize = '12px'
         ..text = 'Texto para VLibras:';
       
       final closeButton = html.ButtonElement()
         ..setAttribute('id', 'close-translation')
         ..style.background = 'none'
         ..style.border = 'none'
-        ..style.fontSize = '18px'
+        ..style.fontSize = '16px'
         ..style.cursor = 'pointer'
         ..style.color = '#666'
+        ..style.fontWeight = 'bold'
         ..text = '×';
       
       final textContent = html.DivElement()
         ..style.color = '#333'
+        ..style.flex = '1'
+        ..style.overflow = 'auto'  // Allow scrolling for overflow content
+        ..style.fontSize = '13px'
         ..text = text;
       
       final instruction = html.DivElement()
-        ..style.marginTop = '10px'
-        ..style.fontSize = '12px'
+        ..style.marginTop = '4px'
+        ..style.fontSize = '9px'
         ..style.color = '#666'
-        ..text = 'Clique no botão azul do VLibras para traduzir este texto.';
+        ..style.textAlign = 'center'
+        ..style.flexShrink = '0'
+        ..text = 'Clique no ícone azul do VLibras';
       
       header.children.addAll([title, closeButton]);
       translationArea.children.addAll([header, textContent, instruction]);
@@ -403,8 +413,8 @@ class VLibrasHelper {
         translationArea.remove();
       });
       
-      // Auto-remove após 10 segundos
-      Future.delayed(Duration(seconds: 10), () {
+      // Auto-remove após 15 segundos
+      Future.delayed(Duration(seconds: 15), () {
         if (translationArea.parent != null) {
           translationArea.remove();
         }

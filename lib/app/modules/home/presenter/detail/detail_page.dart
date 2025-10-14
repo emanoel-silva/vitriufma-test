@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:vitrine_ufma/app/core/components/accessible_network_image_zoom.dart';
 import 'package:vitrine_ufma/app/core/components/text.dart';
 import 'package:vitrine_ufma/app/core/components/vlibras_clickable_text.dart';
 import 'package:vitrine_ufma/app/core/constants/colors.dart';
@@ -184,8 +185,9 @@ class _DetailPageState extends State<DetailPage> {
                   // Imagem do livro
                   Container(
                     height: 400,
-                    child: Image.network(
-                      book!.coverImage,
+                    child: AccessibleNetworkImageZoom(
+                      imageUrl: book!.coverImage,
+                      altText: 'Capa do livro ${book!.title}',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(

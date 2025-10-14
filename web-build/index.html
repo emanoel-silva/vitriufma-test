@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="vitrine_ufma">
+
+  <meta name="google-signin-client_id" content="251785222871-8niradh81b3bul26a31vgphnv13m1867.apps.googleusercontent.com">
+
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <title>vitrine_ufma</title>
+  <link rel="manifest" href="manifest.json">
+
+  <script type="text/javascript">
+    window.flutterWebRenderer = "html";
+  </script>
+
+  <!-- VLibras CSS (opcional para customização) -->
+  <style>
+    [vw] {
+      font-family: inherit !important;
+    }
+    [vw-access-button] {
+      z-index: 9999 !important;
+    }
+  </style>
+
+</head>
+
+<body>
+  <!-- VLibras Widget Container -->
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+
+  <!-- Loading indicator (opcional) -->
+  <div id="loading" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; align-items: center; justify-content: center; z-index: 1000;">
+    <div>Carregando...</div>
+  </div>
+
+  <!-- Flutter App Container -->
+  <div id="flutter-app"></div>
+
+  <!-- VLibras Script -->
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <!-- Script de Debug do VLibras -->
+  <script src="vlibras_debug.js"></script>
+  <script>
+    let vlibrasInitialized = false;
+    
+    function initializeVLibras() {
+      if (vlibrasInitialized || !window.VLibras || !window.VLibras.Widget) {
+        return;
+      }
+      
+      try {
+        console.log('Inicializando VLibras...');
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+        vlibrasInitialized = true;
+        console.log('VLibras inicializado com sucesso');
+      } catch (error) {
+        console.error('Erro ao inicializar VLibras:', error);
+      }
+    }
+    
+    // Aguarda o carregamento completo do VLibras
+    function waitForVLibras() {
+      if (window.VLibras && window.VLibras.Widget) {
+        initializeVLibras();
+      } else {
+        setTimeout(waitForVLibras, 100);
+      }
+    }
+    
+    // Inicialização após carregamento da página
+    document.addEventListener('DOMContentLoaded', function() {
+      waitForVLibras();
+    });
+    
+    // Reinicialização após carregamento do Flutter
+    window.addEventListener('flutter-first-frame', function() {
+      console.log('Flutter carregado, verificando VLibras...');
+      setTimeout(() => {
+        if (!vlibrasInitialized) {
+          waitForVLibras();
+        } else {
+          // Se já foi inicializado, apenas força refresh
+          try {
+            const vlibrasButton = document.querySelector('[vw-access-button]');
+            if (vlibrasButton && vlibrasButton.style.display === 'none') {
+              vlibrasButton.style.display = 'block';
+            }
+          } catch (error) {
+            console.error('Erro ao reexibir VLibras:', error);
+          }
+        }
+      }, 500);
+    });
+    
+    // Função global para debug
+    window.debugVLibras = function() {
+      console.log('VLibras disponível:', !!window.VLibras);
+      console.log('VLibras Widget:', !!window.VLibras?.Widget);
+      console.log('VLibras inicializado:', vlibrasInitialized);
+      console.log('Botão VLibras:', document.querySelector('[vw-access-button]'));
+      console.log('Container VLibras:', document.querySelector('[vw]'));
+    };
+
+    // Função para processar texto específico
+    window.translateWithVLibras = function(text) {
+      console.log('Traduzindo texto:', text);
+      
+      if (!window.VLibras || !window.VLibras.Widget) {
+        console.error('VLibras não disponível');
+        return false;
+      }
+
+      try {
+        // Cria elemento temporário com o texto
+        const tempDiv = document.createElement('div');
+        tempDiv.id = 'vlibras-temp-content';
+        tempDiv.innerHTML = text;
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.top = '-9999px';
+        tempDiv.style.left = '-9999px';
+        tempDiv.setAttribute('lang', 'pt-BR');
+        
+        document.body.appendChild(tempDiv);
+        
+        // Força o VLibras a detectar o novo conteúdo
+        setTimeout(() => {
+          // Simula mudança de conteúdo
+          const event = new Event('DOMContentLoaded', {
+            bubbles: true,
+            cancelable: true
+          });
+          document.dispatchEvent(event);
+          
+          // Remove elemento temporário
+          setTimeout(() => {
+            if (tempDiv && tempDiv.parentNode) {
+              tempDiv.parentNode.removeChild(tempDiv);
+            }
+          }, 2000);
+        }, 100);
+        
+        return true;
+      } catch (error) {
+        console.error('Erro ao traduzir texto:', error);
+        return false;
+      }
+    };
+
+    // Monitora mudanças de texto para VLibras
+    window.addEventListener('vlibras-text-change', function(event) {
+      if (event.detail && event.detail.text) {
+        window.translateWithVLibras(event.detail.text);
+      }
+    });
+  </script>
+
+  <!-- Flutter Bootstrap -->
+  <script src="flutter_bootstrap.js" async></script>
+
+  <!-- Script para esconder loading após carregamento do Flutter -->
+  <script>
+    window.addEventListener('flutter-first-frame', function() {
+      const loading = document.getElementById('loading');
+      if (loading) {
+        loading.style.display = 'none';
+      }
+    });
+  </script>
+
+</body>
+
+</html>

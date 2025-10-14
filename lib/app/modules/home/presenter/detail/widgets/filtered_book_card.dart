@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:vitrine_ufma/app/core/components/accessible_network_image_zoom.dart';
 import 'package:vitrine_ufma/app/core/components/text_widget.dart';
 import 'package:vitrine_ufma/app/core/constants/colors.dart';
 import 'package:vitrine_ufma/app/modules/home/domain/entities/book.dart';
@@ -68,20 +69,21 @@ class FilteredBookCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: Image.network(
-                    book.coverImage,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      // Return a placeholder image or a custom error widget
-                      return Center(
-                        child: Icon(
-                          Icons.error_outline,
-                          color: Colors.red,
-                          size: 48,
-                        ),
-                      );
-                    },
-                  ),
+                child: AccessibleNetworkImageZoom(
+                  imageUrl: book.coverImage,
+                  altText: 'Capa do livro ${book.title}',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    // Return a placeholder image or a custom error widget
+                    return Center(
+                      child: Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 48,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
             //Like e adicionar ao ler mais tarde

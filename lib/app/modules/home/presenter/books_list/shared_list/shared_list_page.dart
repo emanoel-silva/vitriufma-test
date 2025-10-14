@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:vitrine_ufma/app/core/components/accessible_network_image_zoom.dart';
 import 'package:vitrine_ufma/app/core/components/text.dart';
 import 'package:vitrine_ufma/app/core/constants/colors.dart';
 import 'package:vitrine_ufma/app/core/constants/const.dart';
@@ -124,8 +125,9 @@ class _SharedListPageState extends State<SharedListPage> {
                                     Container(
                                       height: 150,
                                       width: 100,
-                                      child: Image.network(
-                                        book.coverImage,
+                                      child: AccessibleNetworkImageZoom(
+                                        imageUrl: book.coverImage,
+                                        altText: 'Capa do livro ${book.title}',
                                         fit: BoxFit.cover,
                                         errorBuilder: (context, error, stackTrace) {
                                           return Center(

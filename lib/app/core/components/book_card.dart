@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vitrine_ufma/app/core/components/accessible_network_image_zoom.dart';
 import 'package:vitrine_ufma/app/core/components/text_widget.dart';
 import 'package:vitrine_ufma/app/core/constants/colors.dart';
 import 'package:vitrine_ufma/app/modules/home/domain/entities/book.dart';
@@ -38,8 +39,12 @@ class BookCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: Image.network(
-                    book.coverImage ,
+                  child: AccessibleNetworkImageZoom(
+                    imageUrl: book.coverImage,
+                    altText: 'Capa do livro ${book.title}',
+                    width: 120,
+                    height: 160,
+                    fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
                       return Center(
@@ -51,7 +56,6 @@ class BookCard extends StatelessWidget {
                         ),
                       );
                     },
-                    fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       // Return a placeholder image or a custom error widget
                       return Center(

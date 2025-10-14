@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:vitrine_ufma/app/core/components/accessible_network_image_zoom.dart';
 import 'package:vitrine_ufma/app/core/components/bottom_button.dart';
 import 'package:vitrine_ufma/app/core/components/error_card.dart';
 import 'package:vitrine_ufma/app/core/components/text.dart';
@@ -138,10 +139,11 @@ class _AddToListModalState extends State<AddToListModal> {
                                       Container(
                                         height: 100,
                                         width: 100,
-                                        child: Image.network(
-                                          store.readingList[index]
+                                        child: AccessibleNetworkImageZoom(
+                                          imageUrl: store.readingList[index]
                                                   ['listInfoMats'][0]
                                               ['cover_image'],
+                                          altText: 'Capa do material',
                                           fit: BoxFit.cover,
                                         ),
                                       ),
