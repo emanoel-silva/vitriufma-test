@@ -130,7 +130,7 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
   final TransformationController _transformationController =
       TransformationController();
   late FocusNode _dialogFocusNode;
-  double _initialScale = 4.0;
+  double _initialScale = 1.0;
   Size? _screenSize;
   Orientation? _orientation;
 
@@ -156,49 +156,7 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
     }
   }
 
-  void _calculateOptimalScale() {
-    final mediaQuery = MediaQuery.of(context);
-    final currentScreenSize = mediaQuery.size;
-    final currentOrientation = mediaQuery.orientation;
-    final devicePixelRatio = mediaQuery.devicePixelRatio;
-    
-    // Only recalculate if screen size or orientation changed
-    if (_screenSize != currentScreenSize || _orientation != currentOrientation) {
-      _screenSize = currentScreenSize;
-      _orientation = currentOrientation;
-      
-      // Base scale calculation considering screen size
-      double baseScale;
-      if (currentScreenSize.shortestSide < 600) {
-        // Small screens (phones)
-        baseScale = 3.0;
-      } else if (currentScreenSize.shortestSide < 1000) {
-        // Medium screens (tablets)
-        baseScale = 4.0;
-      } else {
-        // Large screens (desktops)
-        baseScale = 5.0;
-      }
-      
-      // Adjust for orientation
-      if (currentOrientation == Orientation.landscape) {
-        baseScale = (baseScale * 0.8).clamp(2.0, 6.0);
-      }
-      
-      // Adjust for high DPI screens
-      if (devicePixelRatio > 2.0) {
-        baseScale *= 0.9; // Slightly reduce scale on high DPI screens
-      }
-      
-      _initialScale = baseScale.clamp(2.0, 8.0);
-      
-      // Apply the scale
-      _transformationController.value = Matrix4.identity()..scale(_initialScale);
-    }
-  }
-
   void _calculateInitialScale() {
-    // For now, we'll use the simpler approach but keep the more complex one available
     final mediaQuery = MediaQuery.of(context);
     final currentScreenSize = mediaQuery.size;
     final currentOrientation = mediaQuery.orientation;
@@ -208,22 +166,8 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
       _screenSize = currentScreenSize;
       _orientation = currentOrientation;
       
-      // Adjust initial scale based on screen size
-      if (currentScreenSize.shortestSide < 600) {
-        // Small screens (phones)
-        _initialScale = 3.0;
-      } else if (currentScreenSize.shortestSide < 1000) {
-        // Medium screens (tablets)
-        _initialScale = 4.0;
-      } else {
-        // Large screens (desktops)
-        _initialScale = 5.0;
-      }
-      
-      // In landscape mode, use a slightly smaller scale
-      if (currentOrientation == Orientation.landscape) {
-        _initialScale = (_initialScale * 0.8).clamp(2.0, 6.0);
-      }
+      // Set initial scale to 1.0 (normal scale)
+      _initialScale = 1.0;
       
       // Apply the scale
       _transformationController.value = Matrix4.identity()..scale(_initialScale);
@@ -278,7 +222,7 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
                       transformationController: _transformationController,
                       boundaryMargin: const EdgeInsets.all(20),
                       minScale: 0.5,
-                      maxScale: 10, // Increased max scale for better zoom capabilities
+                      maxScale: 10, // Keep max scale for zooming capabilities
                       onInteractionEnd: (details) {
                         // Reset scale when double tapping
                         if (details.pointerCount == 1) {

@@ -131,7 +131,7 @@ class _SvgZoomDialogState extends State<_SvgZoomDialog> with WidgetsBindingObser
   final TransformationController _transformationController =
       TransformationController();
   late FocusNode _dialogFocusNode;
-  double _initialScale = 4.0;
+  double _initialScale = 1.0;
   Size? _screenSize;
   Orientation? _orientation;
 
@@ -167,22 +167,8 @@ class _SvgZoomDialogState extends State<_SvgZoomDialog> with WidgetsBindingObser
       _screenSize = currentScreenSize;
       _orientation = currentOrientation;
       
-      // Adjust initial scale based on screen size
-      if (currentScreenSize.shortestSide < 600) {
-        // Small screens (phones)
-        _initialScale = 3.0;
-      } else if (currentScreenSize.shortestSide < 1000) {
-        // Medium screens (tablets)
-        _initialScale = 4.0;
-      } else {
-        // Large screens (desktops)
-        _initialScale = 5.0;
-      }
-      
-      // In landscape mode, use a slightly smaller scale
-      if (currentOrientation == Orientation.landscape) {
-        _initialScale = (_initialScale * 0.8).clamp(2.0, 6.0);
-      }
+      // Set initial scale to 1.0 (normal scale)
+      _initialScale = 1.0;
       
       // Apply the scale
       _transformationController.value = Matrix4.identity()..scale(_initialScale);
@@ -237,7 +223,7 @@ class _SvgZoomDialogState extends State<_SvgZoomDialog> with WidgetsBindingObser
                       transformationController: _transformationController,
                       boundaryMargin: const EdgeInsets.all(20),
                       minScale: 0.5,
-                      maxScale: 10, // Increased max scale for better zoom capabilities
+                      maxScale: 10, // Keep max scale for zooming capabilities
                       onInteractionEnd: (details) {
                         // Reset scale when double tapping
                         if (details.pointerCount == 1) {
