@@ -23,6 +23,7 @@ class SearchModal extends StatelessWidget {
           child: const AppImageAsset(
             image: "home.jpeg",
             fit: BoxFit.cover,
+            altText: 'Imagem de fundo da página inicial',
           ),
         ),
         Container(

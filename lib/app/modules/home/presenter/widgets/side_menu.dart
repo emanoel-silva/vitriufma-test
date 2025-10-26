@@ -76,7 +76,7 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
             ),
             child: const Align(
               alignment: Alignment.centerLeft,
-              child: AppImageAsset(image: 'logo.png', imageH: 40),
+              child: AppImageAsset(image: 'logo.png', imageH: 40, altText: 'Logotipo da Vitrine Virtual'),
             ),
           ),
           const Spacer(),

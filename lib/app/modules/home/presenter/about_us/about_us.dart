@@ -346,6 +346,7 @@ class AboutUsPage extends StatelessWidget {
                           AppImageAsset(
                             image: 'youtube_logo.png',
                             imageH: 10,
+                            altText: 'Logotipo do YouTube',
                           ),
                           SizedBox(width: 5),
                           AppText(text: '@ufmadib')
@@ -365,6 +366,7 @@ class AboutUsPage extends StatelessWidget {
                           AppImageAsset(
                             image: 'youtube_logo.png',
                             imageH: 10,
+                            altText: 'Logotipo do YouTube',
                           ),
                           SizedBox(width: 5),
                           AppText(text: '@ufmacampuspinheiro')
@@ -384,6 +386,7 @@ class AboutUsPage extends StatelessWidget {
                           AppImageAsset(
                             image: 'instagram.png',
                             imageH: 10,
+                            altText: 'Logotipo do Instagram',
                           ),
                           SizedBox(width: 5),
                           AppText(text: '@ufma_dib')
@@ -403,6 +406,7 @@ class AboutUsPage extends StatelessWidget {
                           AppImageAsset(
                             image: 'instagram.png',
                             imageH: 10,
+                            altText: 'Logotipo do Instagram',
                           ),
                           SizedBox(width: 5),
                           AppText(text: '@ufmacampuspinheiro')
@@ -456,7 +460,8 @@ class AboutUsPage extends StatelessWidget {
                         height: 200,
                         child: PanoramaViewer(
                           child: Image.asset(
-                              'assets/images/example-ps-scaled.jpg'),
+                              'assets/images/example-ps-scaled.jpg',
+                              semanticLabel: 'Imagem de exemplo da biblioteca'),
                         ))
                     // //https://maps.app.goo.gl/y4XZ2TXUTLzpcLJBA
                     // const AppText(

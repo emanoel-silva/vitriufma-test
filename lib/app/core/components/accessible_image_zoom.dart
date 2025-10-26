@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:universal_platform/universal_platform.dart';
+import 'package:vitrine_ufma/app/core/components/vlibras_clickable_text.dart';
 
 /// An accessible image zoom component that displays images in a modal dialog
 /// when clicked/tapped, with smooth transitions and full keyboard support.
@@ -19,6 +21,9 @@ class AccessibleImageZoom extends StatefulWidget {
   /// Optional fit for the image
   final BoxFit? fit;
 
+  /// Enable VLibras translation for alt text
+  final bool enableVLibras;
+
   const AccessibleImageZoom({
     Key? key,
     required this.image,
@@ -26,6 +31,7 @@ class AccessibleImageZoom extends StatefulWidget {
     this.width,
     this.height,
     this.fit,
+    this.enableVLibras = true,
   }) : super(key: key);
 
   @override
@@ -59,6 +65,7 @@ class _AccessibleImageZoomState extends State<AccessibleImageZoom> {
           width: widget.width,
           height: widget.height,
           fit: widget.fit,
+          enableVLibras: widget.enableVLibras,
           onClose: () => Navigator.of(context).pop(),
         );
       },
@@ -67,8 +74,10 @@ class _AccessibleImageZoomState extends State<AccessibleImageZoom> {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: widget.altText ?? 'Imagem ampliável',
+    final String resolvedAltText = widget.altText ?? 'Imagem ampliável';
+    
+    Widget imageWidget = Semantics(
+      label: resolvedAltText,
       button: true,
       focused: _focusNode.hasFocus,
       child: FocusableActionDetector(
@@ -101,6 +110,17 @@ class _AccessibleImageZoomState extends State<AccessibleImageZoom> {
         ),
       ),
     );
+    
+    // Add VLibras support for alt text if enabled and on web
+    if (widget.enableVLibras && UniversalPlatform.isWeb) {
+      return VLibrasClickableWrapper(
+        textToTranslate: resolvedAltText,
+        tooltip: 'Passe o mouse para traduzir a descrição da imagem em Libras',
+        child: imageWidget,
+      );
+    }
+    
+    return imageWidget;
   }
 }
 
@@ -111,6 +131,7 @@ class _ZoomDialog extends StatefulWidget {
   final double? height;
   final BoxFit? fit;
   final VoidCallback onClose;
+  final bool enableVLibras;
 
   const _ZoomDialog({
     Key? key,
@@ -120,6 +141,7 @@ class _ZoomDialog extends StatefulWidget {
     this.height,
     this.fit,
     required this.onClose,
+    this.enableVLibras = true,
   }) : super(key: key);
 
   @override
@@ -184,7 +206,7 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
+    Widget dialogWidget = Focus(
       focusNode: _dialogFocusNode,
       onKeyEvent: (node, event) {
         // Close dialog when ESC is pressed
@@ -249,5 +271,16 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
         ),
       ),
     );
+    
+    // Add VLibras support for alt text if enabled and on web
+    if (widget.enableVLibras && UniversalPlatform.isWeb) {
+      return VLibrasClickableWrapper(
+        textToTranslate: widget.altText ?? 'Imagem ampliável',
+        tooltip: 'Passe o mouse para traduzir a descrição da imagem em Libras',
+        child: dialogWidget,
+      );
+    }
+    
+    return dialogWidget;
   }
 }

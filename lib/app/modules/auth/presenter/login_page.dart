@@ -56,6 +56,7 @@ class _LoginPageState extends State<LoginPage> {
                       AppImageAsset(
                         image: "logo.png",
                         imageH: 100,
+                        altText: 'Logotipo da Vitrine Virtual',
                       ),
                       const SizedBox(height: 10),
                       const Text(
@@ -157,7 +158,9 @@ class _LoginPageState extends State<LoginPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   AppImageAsset(
-                                      image: 'google.jpeg', imageH: 25),
+                                      image: 'google.jpeg', imageH: 25,
+                                      altText: 'Logotipo do Google',
+                                    ),
                                   const SizedBox(width: 10),
                                   const Text(
                                     "Login com Google",

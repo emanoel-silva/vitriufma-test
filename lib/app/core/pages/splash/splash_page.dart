@@ -52,6 +52,7 @@ class _SplashPageState extends State<SplashPage> {
                         width: 100,
                         child: AppImageAsset(
                           image: 'logo.png',
+                          altText: 'Logotipo da Vitrine Virtual',
                         ),
                       ),
                     ),

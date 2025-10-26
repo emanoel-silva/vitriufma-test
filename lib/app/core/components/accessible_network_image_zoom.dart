@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:universal_platform/universal_platform.dart';
+import 'package:vitrine_ufma/app/core/components/vlibras_clickable_text.dart';
 
 /// An accessible network image zoom component that displays images in a modal dialog
 /// when clicked/tapped, with smooth transitions and full keyboard support.
@@ -25,6 +27,9 @@ class AccessibleNetworkImageZoom extends StatefulWidget {
   /// Optional error builder
   final ImageErrorWidgetBuilder? errorBuilder;
 
+  /// Enable VLibras translation for alt text
+  final bool enableVLibras;
+
   const AccessibleNetworkImageZoom({
     Key? key,
     required this.imageUrl,
@@ -34,6 +39,7 @@ class AccessibleNetworkImageZoom extends StatefulWidget {
     this.fit,
     this.loadingBuilder,
     this.errorBuilder,
+    this.enableVLibras = true,
   }) : super(key: key);
 
   @override
@@ -69,6 +75,7 @@ class _AccessibleNetworkImageZoomState extends State<AccessibleNetworkImageZoom>
           fit: widget.fit,
           loadingBuilder: widget.loadingBuilder,
           errorBuilder: widget.errorBuilder,
+          enableVLibras: widget.enableVLibras,
           onClose: () => Navigator.of(context).pop(),
         );
       },
@@ -77,8 +84,10 @@ class _AccessibleNetworkImageZoomState extends State<AccessibleNetworkImageZoom>
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: widget.altText ?? 'Imagem ampliável',
+    final String resolvedAltText = widget.altText ?? 'Imagem ampliável';
+    
+    Widget imageWidget = Semantics(
+      label: resolvedAltText,
       button: true,
       focused: _focusNode.hasFocus,
       child: FocusableActionDetector(
@@ -113,6 +122,17 @@ class _AccessibleNetworkImageZoomState extends State<AccessibleNetworkImageZoom>
         ),
       ),
     );
+    
+    // Add VLibras support for alt text if enabled and on web
+    if (widget.enableVLibras && UniversalPlatform.isWeb) {
+      return VLibrasClickableWrapper(
+        textToTranslate: resolvedAltText,
+        tooltip: 'Passe o mouse para traduzir a descrição da imagem em Libras',
+        child: imageWidget,
+      );
+    }
+    
+    return imageWidget;
   }
 }
 
@@ -125,6 +145,7 @@ class _NetworkImageZoomDialog extends StatefulWidget {
   final ImageLoadingBuilder? loadingBuilder;
   final ImageErrorWidgetBuilder? errorBuilder;
   final VoidCallback onClose;
+  final bool enableVLibras;
 
   const _NetworkImageZoomDialog({
     Key? key,
@@ -136,6 +157,7 @@ class _NetworkImageZoomDialog extends StatefulWidget {
     this.loadingBuilder,
     this.errorBuilder,
     required this.onClose,
+    this.enableVLibras = true,
   }) : super(key: key);
 
   @override
@@ -200,7 +222,7 @@ class _NetworkImageZoomDialogState extends State<_NetworkImageZoomDialog> with W
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
+    Widget dialogWidget = Focus(
       focusNode: _dialogFocusNode,
       onKeyEvent: (node, event) {
         // Close dialog when ESC is pressed
@@ -267,5 +289,16 @@ class _NetworkImageZoomDialogState extends State<_NetworkImageZoomDialog> with W
         ),
       ),
     );
+    
+    // Add VLibras support for alt text if enabled and on web
+    if (widget.enableVLibras && UniversalPlatform.isWeb) {
+      return VLibrasClickableWrapper(
+        textToTranslate: widget.altText ?? 'Imagem ampliável',
+        tooltip: 'Passe o mouse para traduzir a descrição da imagem em Libras',
+        child: dialogWidget,
+      );
+    }
+    
+    return dialogWidget;
   }
 }

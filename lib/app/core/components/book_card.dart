@@ -45,6 +45,7 @@ class BookCard extends StatelessWidget {
                     width: 120,
                     height: 160,
                     fit: BoxFit.cover,
+                    enableVLibras: true,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
                       return Center(
