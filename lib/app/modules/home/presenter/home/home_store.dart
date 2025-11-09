@@ -136,14 +136,20 @@ abstract class _HomeStoreBase with Store {
     });
   }
 
-  // BUSCA MATERIS RELACIONADOS
+  // BUSCA MATERIAIS MAIS ACESSADOS
   @observable
   ObservableList mostAccessedMaterials = [].asObservable();
   @observable
-  bool isLoadingMostAccessedMaterials = false; //
+  bool isLoadingMostAccessedMaterials = false;
   @action
   Future<void> getMostAccessedMaterials(int limit) async {
-    if (isLoadingMostAccessedMaterials) return;
+  
+    if (isLoadingMostAccessedMaterials) {
+      debugPrint("getMostAccessedMaterials: Já está carregando, retornando...");
+      return;
+    }
+    
+    debugPrint("getMostAccessedMaterials: Iniciando carregamento com limit=$limit");
     isLoadingMostAccessedMaterials = true;
     loading = true;
     mostAccessedMaterials.clear();
@@ -151,22 +157,35 @@ abstract class _HomeStoreBase with Store {
     var result = await infoMaterialUsecase.getMostAccessedMaterials(limit);
 
     result.fold((l) async {
-      debugPrint("Error: $l");
+      debugPrint("getMostAccessedMaterials Error: $l");
       loading = false;
       isLoadingMostAccessedMaterials = false;
     }, (r) async {
-      debugPrint("Success: ");
-      for (var id in r) {
-        var result = await infoMaterialUsecase.getDetailInfoMaterial(id);
-        result.fold((l) {
-          debugPrint("Error: $l");
-          loading = false;
-        }, (r) {
-          mostAccessedMaterials
-              .add(Book.fromJson(Map<String, dynamic>.from(r).asObservable()));
-        });
+      debugPrint("getMostAccessedMaterials Success: Recebidos ${r.length} materiais");
+      
+      // A API retorna objetos com estrutura {id, title, author, cover_image, rating}
+      // Precisamos buscar os detalhes completos de cada material
+      for (var item in r) {
+        try {
+          // Extrai o ID do item
+          final id = item['id'];
+          debugPrint("getMostAccessedMaterials: Buscando detalhes do material ID=$id (${item['title']})");
+          
+          var detailResult = await infoMaterialUsecase.getDetailInfoMaterial(id);
+          detailResult.fold((l) {
+            debugPrint("getMostAccessedMaterials Error ao buscar detalhes do ID $id: $l");
+          }, (bookData) {
+            debugPrint("getMostAccessedMaterials: Material ${bookData['title']} adicionado");
+            mostAccessedMaterials
+                .add(Book.fromJson(Map<String, dynamic>.from(bookData).asObservable()));
+          });
+        } catch (e) {
+          debugPrint("getMostAccessedMaterials: Erro ao processar item: $e");
+        }
       }
+
       mostAccessedMaterials = mostAccessedMaterials.asObservable();
+      debugPrint("getMostAccessedMaterials: Total de ${mostAccessedMaterials.length} materiais carregados");
       loading = false;
       isLoadingMostAccessedMaterials = false;
     });
@@ -179,7 +198,13 @@ abstract class _HomeStoreBase with Store {
   bool isLoadingTopRatedMaterials = false;
   @action
   Future<void> getTopRatedMaterials(int limit) async {
-    if (isLoadingTopRatedMaterials) return;
+
+    if (isLoadingTopRatedMaterials) {
+      debugPrint("getTopRatedMaterials: Já está carregando, retornando...");
+      return;
+    }
+    
+    debugPrint("getTopRatedMaterials: Iniciando carregamento com limit=$limit");
     isLoadingTopRatedMaterials = true;
     loading = true;
     topRatedMaterials.clear();
@@ -187,22 +212,34 @@ abstract class _HomeStoreBase with Store {
     var result = await infoMaterialUsecase.getTopRatedMaterials(limit);
 
     result.fold((l) async {
-      debugPrint("Error: $l");
+      debugPrint("getTopRatedMaterials Error: $l");
       loading = false;
       isLoadingTopRatedMaterials = false;
     }, (r) async {
-      debugPrint("Success: ");
-      for (var id in r) {
-        var result = await infoMaterialUsecase.getDetailInfoMaterial(id);
-        result.fold((l) {
-          debugPrint("Error: $l");
-          loading = false;
-        }, (r) {
-          topRatedMaterials
-              .add(Book.fromJson(Map<String, dynamic>.from(r).asObservable()));
-        });
+      debugPrint("getTopRatedMaterials Success: Recebidos ${r.length} materiais");
+      
+      // A API retorna objetos com estrutura {id, title, author, cover_image, rating}
+      // Precisamos buscar os detalhes completos de cada material
+      for (var item in r) {
+        try {
+          // Extrai o ID do item
+          final id = item['id'];
+          debugPrint("getTopRatedMaterials: Buscando detalhes do material ID=$id (${item['title']})");
+          
+          var detailResult = await infoMaterialUsecase.getDetailInfoMaterial(id);
+          detailResult.fold((l) {
+            debugPrint("getTopRatedMaterials Error ao buscar detalhes do ID $id: $l");
+          }, (bookData) {
+            debugPrint("getTopRatedMaterials: Material ${bookData['title']} adicionado");
+            topRatedMaterials
+                .add(Book.fromJson(Map<String, dynamic>.from(bookData).asObservable()));
+          });
+        } catch (e) {
+          debugPrint("getTopRatedMaterials: Erro ao processar item: $e");
+        }
       }
       topRatedMaterials = topRatedMaterials.asObservable();
+      debugPrint("getTopRatedMaterials: Total de ${topRatedMaterials.length} materiais carregados");
       loading = false;
       isLoadingTopRatedMaterials = false;
     });

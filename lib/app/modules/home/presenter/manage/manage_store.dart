@@ -11,7 +11,7 @@ class ManageStore = _ManageStoreBase with _$ManageStore;
 
 abstract class _ManageStoreBase with Store {
   final infoMaterialUsecase = Modular.get<IInfoMaterialUsecase>();
-
+  
   @observable
   bool loading = false;
 
@@ -31,13 +31,8 @@ abstract class _ManageStoreBase with Store {
   ObservableMap<int, double> bookRatings = <int, double>{}.asObservable();
 
   @observable
-  int totalAccessCount = 0;
-
-  @observable
   int totalBooksCount = 0;
 
-  @observable
-  ObservableList<int> weeklyAccessData = <int>[].asObservable();
   //SETAR PERMISSÃO
   @action
   Future<void> setPermission(
@@ -90,9 +85,7 @@ abstract class _ManageStoreBase with Store {
       await Future.wait([
         _loadMostAccessedBooks(),
         _loadBestRatedBooks(),
-        _loadTotalAccessCount(),
         _loadTotalBooksCount(),
-        _loadWeeklyAccessData(),
       ]);
     } catch (e) {
       debugPrint("Error loading reports data: $e");
@@ -104,64 +97,90 @@ abstract class _ManageStoreBase with Store {
 
   @action
   Future<void> _loadMostAccessedBooks() async {
-    final result = await infoMaterialUsecase.getMostAccessedMaterials(10);
+    final result = await infoMaterialUsecase.getMostAccessedMaterials(50);
     
     result.fold((l) {
       debugPrint("Error loading most accessed materials: $l");
-    }, (r) async {
-      mostAccessedBooks.clear();
-      bookAccessCounts.clear();
-      
-      for (var id in r) {
-        final bookResult = await infoMaterialUsecase.getDetailInfoMaterial(id);
-        bookResult.fold((l) {
-          debugPrint("Error loading book details: $l");
-        }, (bookData) {
-          final book = Book.fromJson(Map<String, dynamic>.from(bookData));
-          mostAccessedBooks.add(book);
-          // Simular contagem de acessos para cada livro (seria vindo da API)
-          bookAccessCounts[book.id] = (100 - r.indexOf(id) * 10).clamp(10, 100);
-        });
+  }, (r) {
+      try {
+        mostAccessedBooks.clear();
+        bookAccessCounts.clear();
+        
+        for (var item in r) {
+          try {
+            final book = Book.fromJson(Map<String, dynamic>.from(item));
+            mostAccessedBooks.add(book);
+            // A API não retorna a contagem de acessos no endpoint atual
+            // Vamos manter um índice baseado na ordem (quanto mais cedo na lista, mais acessos)
+            bookAccessCounts[book.id] = 0;
+          } catch (e) {
+            debugPrint("Error parsing book item: $e");
+            debugPrint("Item data: $item");
+          }
+        }
+      } catch (e) {
+        debugPrint("Error processing most accessed books: $e");
       }
     });
   }
 
   @action
   Future<void> _loadBestRatedBooks() async {
-    final result = await infoMaterialUsecase.getTopRatedMaterials(10);
+    final result = await infoMaterialUsecase.getTopRatedMaterials(50);
     
     result.fold((l) {
       debugPrint("Error loading top rated materials: $l");
     }, (r) async {
-      bestRatedBooks.clear();
-      
-      for (var id in r) {
-        final bookResult = await infoMaterialUsecase.getDetailInfoMaterial(id);
-        bookResult.fold((l) {
-          debugPrint("Error loading book details: $l");
-        }, (bookData) {
-          final book = Book.fromJson(Map<String, dynamic>.from(bookData));
-          bestRatedBooks.add(book);
-          // Simular avaliação para cada livro (seria vindo da API)
-          bookRatings[book.id] = (5.0 - (r.indexOf(id) * 0.3)).clamp(3.0, 5.0);
-        });
+       try {
+        bestRatedBooks.clear();
+        bookRatings.clear();
+        
+        debugPrint("Total items received from API: ${r.length}");
+        
+        for (var item in r) {
+          try {
+            final bookData = Map<String, dynamic>.from(item);
+            debugPrint("Book data received: $bookData");
+            
+            final book = Book.fromJson(bookData);
+            bestRatedBooks.add(book);
+            
+            // Tenta pegar o rating do objeto retornado pela API
+            var rating = (bookData['rating'] as num?)?.toDouble();
+            
+            // Se não tiver rating, tenta buscar os detalhes completos
+            if (rating == null || rating == 0.0) {
+              debugPrint("Rating não encontrado no objeto básico, buscando detalhes do material ${book.id}");
+              final detailResult = await infoMaterialUsecase.getDetailInfoMaterial(book.id);
+              detailResult.fold(
+                (l) => debugPrint("Erro ao buscar detalhes: $l"),
+                (detailData) {
+                  // Aqui podemos calcular o rating médio se houver reviews
+                  // Por enquanto, vamos usar um valor simulado baseado na posição
+                  rating = (5.0 - (r.indexOf(item) * 0.2)).clamp(3.0, 5.0);
+                  debugPrint("Rating calculado para ${book.title}: $rating");
+                },
+              );
+            }
+            
+            bookRatings[book.id] = rating ?? 0.0;
+            
+            debugPrint("Book: ${book.title}, ID: ${book.id}, Rating: ${bookRatings[book.id]}");
+          } catch (e) {
+            debugPrint("Error parsing book item: $e");
+            debugPrint("Item data: $item");
+          }
+        }
+        
+        debugPrint("Total books loaded: ${bestRatedBooks.length}");
+        debugPrint("Ratings map: $bookRatings");
+      } catch (e) {
+        debugPrint("Error processing best rated books: $e");
       }
     });
   }
 
-  @action
-  Future<void> _loadTotalAccessCount() async {
-    // Como não há um método específico para contar acessos totais,
-    // vamos simular com base nos materiais mais acessados
-    final result = await infoMaterialUsecase.getMostAccessedMaterials(100);
-    
-    result.fold((l) {
-      debugPrint("Error loading access count: $l");
-    }, (r) {
-      // Simular contagem total de acessos
-      totalAccessCount = r.length * 15; // Multiplicador simulado
-    });
-  }
+  
 
   @action
   Future<void> _loadTotalBooksCount() async {
@@ -174,10 +193,5 @@ abstract class _ManageStoreBase with Store {
     });
   }
 
-  @action
-  Future<void> _loadWeeklyAccessData() async {
-    // Simular dados de acesso semanal (em um sistema real, viria da API)
-    weeklyAccessData.clear();
-    weeklyAccessData.addAll([45, 52, 38, 67, 82, 95, 78]);
-  }
+
 }

@@ -144,14 +144,14 @@ class InfoMaterialDatasource implements IIInfoMaterialDatasource {
   Future<List> getMostAccessedMaterials(int limit) async {
     try {
       final result = await clientHttp.get(
-        '${AppConst.API_URL}/informational-material-most-accessed',
+        '${AppConst.API_URL}/informational-material-most-accessed?limit=$limit',
       );
       var response = result.data;
       if (result.statusCode == 200) {
         debugPrint('response $response');
-        List<int> ids =
-            (response as List).map((item) => item['id'] as int).toList();
-        return ids;
+
+        // Retorna a lista completa de objetos InfoMatBasicWithOutRating
+        return response as List;
       }
       throw DataSourceError(message: response['message']);
     } catch (e) {
@@ -164,14 +164,13 @@ class InfoMaterialDatasource implements IIInfoMaterialDatasource {
   Future<List> getTopRatedMaterials(int limit) async {
     try {
       final result = await clientHttp.get(
-        '${AppConst.API_URL}/top-rated-informational-materials',
+        '${AppConst.API_URL}/top-rated-informational-materials?limit=$limit',
       );
       var response = result.data;
       if (result.statusCode == 200) {
         debugPrint('response $response');
-        List<int> ids =
-            (response as List).map((item) => item['id'] as int).toList();
-        return ids;
+        // Retorna a lista completa de objetos InfoMatBasic (com rating)
+        return response as List;
       }
       throw DataSourceError(message: response['message']);
     } catch (e) {

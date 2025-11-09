@@ -73,19 +73,51 @@ mixin _$ManageStore on _ManageStoreBase, Store {
     });
   }
 
-  late final _$totalAccessCountAtom =
-      Atom(name: '_ManageStoreBase.totalAccessCount', context: context);
+  late final _$bookAccessCountsAtom =
+      Atom(name: '_ManageStoreBase.bookAccessCounts', context: context);
 
   @override
-  int get totalAccessCount {
-    _$totalAccessCountAtom.reportRead();
-    return super.totalAccessCount;
+  ObservableMap<int, int> get bookAccessCounts {
+    _$bookAccessCountsAtom.reportRead();
+    return super.bookAccessCounts;
   }
 
   @override
-  set totalAccessCount(int value) {
-    _$totalAccessCountAtom.reportWrite(value, super.totalAccessCount, () {
-      super.totalAccessCount = value;
+  set bookAccessCounts(ObservableMap<int, int> value) {
+    _$bookAccessCountsAtom.reportWrite(value, super.bookAccessCounts, () {
+      super.bookAccessCounts = value;
+    });
+  }
+
+  late final _$bookRatingsAtom =
+      Atom(name: '_ManageStoreBase.bookRatings', context: context);
+
+  @override
+  ObservableMap<int, double> get bookRatings {
+    _$bookRatingsAtom.reportRead();
+    return super.bookRatings;
+  }
+
+  @override
+  set bookRatings(ObservableMap<int, double> value) {
+    _$bookRatingsAtom.reportWrite(value, super.bookRatings, () {
+      super.bookRatings = value;
+    });
+  }
+
+  late final _$totalBooksCountAtom =
+      Atom(name: '_ManageStoreBase.totalBooksCount', context: context);
+
+  @override
+  int get totalBooksCount {
+    _$totalBooksCountAtom.reportRead();
+    return super.totalBooksCount;
+  }
+
+  @override
+  set totalBooksCount(int value) {
+    _$totalBooksCountAtom.reportWrite(value, super.totalBooksCount, () {
+      super.totalBooksCount = value;
     });
   }
 
@@ -137,13 +169,13 @@ mixin _$ManageStore on _ManageStoreBase, Store {
         .run(() => super._loadBestRatedBooks());
   }
 
-  late final _$_loadTotalAccessCountAsyncAction =
-      AsyncAction('_ManageStoreBase._loadTotalAccessCount', context: context);
+   late final _$_loadTotalBooksCountAsyncAction =
+      AsyncAction('_ManageStoreBase._loadTotalBooksCount', context: context);
 
   @override
-  Future<void> _loadTotalAccessCount() {
-    return _$_loadTotalAccessCountAsyncAction
-        .run(() => super._loadTotalAccessCount());
+  Future<void> _loadTotalBooksCount() {
+    return _$_loadTotalBooksCountAsyncAction
+        .run(() => super._loadTotalBooksCount());
   }
 
   @override
@@ -153,7 +185,9 @@ loading: ${loading},
 loadingReports: ${loadingReports},
 mostAccessedBooks: ${mostAccessedBooks},
 bestRatedBooks: ${bestRatedBooks},
-totalAccessCount: ${totalAccessCount}
+bookAccessCounts: ${bookAccessCounts},
+bookRatings: ${bookRatings},
+totalBooksCount: ${totalBooksCount}
     ''';
   }
 }

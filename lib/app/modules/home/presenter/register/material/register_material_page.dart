@@ -12,6 +12,8 @@ import 'package:vitrine_ufma/app/modules/home/domain/entities/book.dart';
 import 'package:vitrine_ufma/app/modules/home/presenter/register/components/drag_and_drop.dart';
 import 'package:vitrine_ufma/app/modules/home/presenter/register/material/register_material_store.dart';
 
+import '../../../../../core/utils/material_teste_helper.dart';
+
 class RegisterMaterialPage extends StatefulWidget {
   Book? book;
   RegisterMaterialPage({super.key, this.book}) {}
@@ -284,10 +286,104 @@ class _RegisterMaterialPageState extends State<RegisterMaterialPage> {
                     width: formWidth - 40,
                   ),
                   const SizedBox(height: 20),
-                  // Save button
+                  // Save button and Test button
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      // Botão de Teste (Debug)
+                      InkWell(
+                        onTap: () async {
+                          // Mostrar diálogo de confirmação
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Row(
+                                children: const [
+                                  Icon(Icons.science, color: AppColors.blue),
+                                  SizedBox(width: 8),
+                                  Text('Cadastrar Materiais de Teste'),
+                                ],
+                              ),
+                              content: const Text(
+                                'Deseja cadastrar materiais de teste no sistema?\n\n'
+                                'Isso irá adicionar 10 materiais de exemplo de diferentes áreas.',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                  child: const Text('Cancelar'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.blue,
+                                  ),
+                                  child: const Text('Cadastrar'),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true) {
+                            // Mostrar loading
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+
+                            // Cadastrar materiais
+                            final resultado = await MaterialTesteHelper.cadastrarMaterialTeste();
+
+                            // Fechar loading
+                            Navigator.of(context).pop();
+
+                            // Mostrar resultado
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '${resultado['success']} materiais cadastrados com sucesso!\n'
+                                  'Erros: ${resultado['error']}',
+                                ),
+                                backgroundColor: resultado['error'] == 0
+                                    ? Colors.green
+                                    : Colors.orange,
+                                duration: const Duration(seconds: 4),
+                              ),
+                            );
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.orange,
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.science,
+                                color: AppColors.white,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              TextWidget(
+                                text: 'Cadastrar Teste',
+                                fontSize: 14,
+                                color: AppColors.white,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Botão Salvar
+                      
                       InkWell(
                         onTap: () async {
                           if (store.validateFields()) {

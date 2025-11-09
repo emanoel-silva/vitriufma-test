@@ -455,14 +455,22 @@ class AboutUsPage extends StatelessWidget {
                       fontWeight: 'bold',
                     ),
                     const SizedBox(height: 10),
-                    SizedBox(
-                        width: 400,
-                        height: 200,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: SizedBox(
+                        width: isWeb ? width * 0.8 : width - (AppConst.sidePadding * 2),
+                        height: isWeb ? 400 : 300,
                         child: PanoramaViewer(
+                          sensitivity: 1.5,
+                          animSpeed: 1.0,
+                          sensorControl: SensorControl.orientation,
                           child: Image.asset(
-                              'assets/images/example-ps-scaled.jpg',
-                              semanticLabel: 'Imagem de exemplo da biblioteca'),
-                        ))
+                            'assets/images/example-ps-scaled.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    )
                     // //https://maps.app.goo.gl/y4XZ2TXUTLzpcLJBA
                     // const AppText(
                     //   textAlign: TextAlign.justify,

@@ -17,6 +17,10 @@ class ManagePage extends StatefulWidget {
 class _ManagePageState extends State<ManagePage> {
   final ManageStore store = Modular.get<ManageStore>();
   final LayoutStore layoutStore = Modular.get<LayoutStore>();
+  
+  bool showAllMostAccessed = false;
+  bool showAllBestRated = false;
+  String chartFilter = 'material'; // 'material' ou 'author'
 
   @override
   void initState() {
@@ -354,15 +358,7 @@ class _ManagePageState extends State<ManagePage> {
         // Cards de estatísticas
         Row(
           children: [
-            Expanded(
-              child: _buildStatCard(
-                "Total de Acessos",
-                store.totalAccessCount.toString(),
-                Icons.visibility,
-                Colors.blue,
-              ),
-            ),
-            const SizedBox(width: 15),
+
             Expanded(
               child: _buildStatCard(
                 "Livros Cadastrados",
@@ -393,19 +389,20 @@ class _ManagePageState extends State<ManagePage> {
         ),
         const SizedBox(height: 30),
         
-        // Gráficos e listas
+        // Listas lado a lado
+
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Gráfico de livros mais acessados
+        // Lista de mais acessados
             Expanded(
               flex: 3,
-              child: _buildMostAccessedChart(),
+              child: _buildMostAccessedList(),
             ),
             const SizedBox(width: 20),
             // Lista de melhores avaliados
             Expanded(
-              flex: 2,
+
               child: _buildBestRatedList(),
             ),
           ],
@@ -413,8 +410,8 @@ class _ManagePageState extends State<ManagePage> {
         
         const SizedBox(height: 30),
         
-        // Seção de acessos por período
-        _buildAccessTrendsChart(),
+       // Gráfico de barras dos melhores avaliados
+        _buildBestRatedChart(),
       ],
     );
   }
@@ -461,9 +458,13 @@ class _ManagePageState extends State<ManagePage> {
     );
   }
 
-  Widget _buildMostAccessedChart() {
+  Widget _buildMostAccessedList() {
+    const itemsPerPage = 5;
+    final displayBooks = showAllMostAccessed 
+        ? store.mostAccessedBooks 
+        : store.mostAccessedBooks.take(itemsPerPage).toList();
+
     return Container(
-      height: 300,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -480,129 +481,158 @@ class _ManagePageState extends State<ManagePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AppText(
-            text: "Livros Mais Acessados",
-            fontSize: 16,
-            fontWeight: 'bold',
-            color: Colors.black,
+ Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const AppText(
+                text: "Livros Mais Acessados",
+                fontSize: 16,
+                fontWeight: 'bold',
+                color: Colors.black,
+              ),
+              if (store.mostAccessedBooks.length > itemsPerPage)
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      showAllMostAccessed = !showAllMostAccessed;
+                    });
+                  },
+                  child: AppText(
+                    text: showAllMostAccessed ? "Mostrar Menos" : "Mostrar Mais",
+                    fontSize: 14,
+                    fontWeight: 'medium',
+                    color: Colors.blue,
+                  ),
+                ),
+            ],
           ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: store.mostAccessedBooks.isEmpty
-                ? const Center(
+          const SizedBox(height: 15),
+          store.mostAccessedBooks.isEmpty
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20.0),
                     child: AppText(
                       text: "Nenhum dado disponível",
                       fontSize: 14,
                       color: Colors.grey,
                     ),
-                  )
-                : BarChart(
-                    BarChartData(
-                      alignment: BarChartAlignment.spaceAround,
-                      maxY: store.bookAccessCounts.values.isNotEmpty 
-                          ? store.bookAccessCounts.values.reduce((a, b) => a > b ? a : b).toDouble() + 20
-                          : 100,
-                      barTouchData: BarTouchData(
-                        enabled: true,
-                        touchTooltipData: BarTouchTooltipData(
-                          getTooltipColor: (group) => Colors.blueGrey,
-                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                            final book = store.mostAccessedBooks[group.x.toInt()];
-                            return BarTooltipItem(
-                              '${book.title}\n',
-                              const TextStyle(
+                   ),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: displayBooks.length,
+                  itemBuilder: (context, index) {
+                    final book = displayBooks[index];
+                    
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Row(
+                        children: [
+                          // Ranking badge
+                          Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: _getRankColor(index),
+                              shape: BoxShape.circle,
+                            ),
+
+                            child: Center(
+                              child: AppText(
+                                text: '${index + 1}',
+                                fontSize: 14,
+                                fontWeight: 'bold',
                                 color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: '${rod.toY.round()} acessos',
-                                  style: const TextStyle(
-                                    color: Colors.yellow,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                      titlesData: FlTitlesData(
-                        show: true,
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            getTitlesWidget: (double value, TitleMeta meta) {
-                              if (value.toInt() < store.mostAccessedBooks.length) {
-                                final book = store.mostAccessedBooks[value.toInt()];
-                                return Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Text(
-                                    book.title.length > 10 
-                                        ? '${book.title.substring(0, 10)}...'
-                                        : book.title,
-                                    style: const TextStyle(fontSize: 10),
-                                  ),
-                                );
-                              }
-                              return const Text('');
-                            },
-                          ),
-                        ),
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 40,
-                          ),
-                        ),
-                        topTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        rightTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                      ),
-                      borderData: FlBorderData(show: false),
-                      barGroups: store.mostAccessedBooks
-                          .take(6)
-                          .toList()
-                          .asMap()
-                          .entries
-                          .map((entry) {
-                        final book = entry.value;
-                        final accessCount = store.bookAccessCounts[book.id] ?? 0;
-                        return BarChartGroupData(
-                          x: entry.key,
-                          barRods: [
-                            BarChartRodData(
-                              toY: accessCount.toDouble(),
-                              color: Colors.blue.withOpacity(0.8),
-                              width: 20,
-                              borderRadius: BorderRadius.circular(4),
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.blue.withOpacity(0.8),
-                                  Colors.blue.withOpacity(0.4),
-                                ],
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
                               ),
                             ),
-                          ],
-                        );
-                      }).toList(),
-                    ),
-                  ),
-          ),
+                          ),
+                          const SizedBox(width: 15),
+                          // Imagem de capa
+                          if (book.coverImage.isNotEmpty)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: Image.network(
+                                book.coverImage,
+                                width: 40,
+                                height: 60,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 40,
+                                    height: 60,
+                                    color: Colors.grey[300],
+                                    child: Icon(
+                                      Icons.book,
+                                      color: Colors.grey[600],
+                                      size: 24,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          const SizedBox(width: 15),
+                          // Informações do livro
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AppText(
+                                  text: book.title,
+                                  fontSize: 13,
+                                  fontWeight: 'medium',
+                                  color: Colors.black,
+                                ),
+                                if (book.author.isNotEmpty) ...[
+                                  const SizedBox(height: 4),
+                                  AppText(
+                                    text: 'Por: ${book.author.join(", ")}',
+                                    fontSize: 11,
+                                    color: Colors.grey[500]!,
+                                  ),
+ 
+                                ],
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          // Badge de posição no ranking (já que a API não retorna contagem)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: AppText(
+                              text: '#${index + 1}',
+                              fontSize: 11,
+                              fontWeight: 'bold',
+                              color: Colors.blue[700]!,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
         ],
       ),
     );
   }
 
   Widget _buildBestRatedList() {
+    const itemsPerPage = 5;
+    final displayBooks = showAllBestRated 
+        ? store.bestRatedBooks 
+        : store.bestRatedBooks.take(itemsPerPage).toList();
+
     return Container(
-      height: 300,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -619,113 +649,203 @@ class _ManagePageState extends State<ManagePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AppText(
-            text: "Melhores Avaliados",
-            fontSize: 16,
-            fontWeight: 'bold',
-            color: Colors.black,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const AppText(
+                text: "Melhores Avaliados",
+                fontSize: 16,
+                fontWeight: 'bold',
+                color: Colors.black,
+              ),
+              if (store.bestRatedBooks.length > itemsPerPage)
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      showAllBestRated = !showAllBestRated;
+                    });
+                  },
+                  child: AppText(
+                    text: showAllBestRated ? "Mostrar Menos" : "Mostrar Mais",
+                    fontSize: 14,
+                    fontWeight: 'medium',
+                    color: Colors.blue,
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 15),
-          Expanded(
-            child: store.bestRatedBooks.isEmpty
-                ? const Center(
+          store.bestRatedBooks.isEmpty
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20.0),
                     child: AppText(
                       text: "Nenhum dado disponível",
                       fontSize: 14,
                       color: Colors.grey,
                     ),
-                  )
-                : ListView.builder(
-                    itemCount: store.bestRatedBooks.length,
-                    itemBuilder: (context, index) {
-                      final book = store.bestRatedBooks[index];
-                      final rating = store.bookRatings[book.id] ?? 0.0;
-                      
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.grey[200]!),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    color: _getRankColor(index),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Center(
-                                    child: AppText(
-                                      text: '${index + 1}',
-                                      fontSize: 12,
-                                      fontWeight: 'bold',
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: AppText(
-                                    text: book.title.length > 30 
-                                        ? '${book.title.substring(0, 30)}...'
-                                        : book.title,
-                                    fontSize: 13,
-                                    fontWeight: 'medium',
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
+                   ),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: displayBooks.length,
+                  itemBuilder: (context, index) {
+                    final book = displayBooks[index];
+                    final rating = store.bookRatings[book.id] ?? 0.0;
+                    
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Row(
+                        children: [
+                          // Ranking badge
+                          Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: _getRankColor(index),
+                              shape: BoxShape.circle,
                             ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                ...List.generate(5, (starIndex) {
-                                  return Icon(
-                                    Icons.star,
-                                    size: 14,
-                                    color: starIndex < rating.floor()
-                                        ? Colors.amber
-                                        : Colors.grey[300],
-                                  );
-                                }),
-                                const SizedBox(width: 8),
-                                AppText(
-                                  text: rating.toStringAsFixed(1),
-                                  fontSize: 12,
-                                  fontWeight: 'medium',
-                                  color: Colors.grey[600]!,
-                                ),
-                              ],
-                            ),
-                            if (book.author.isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              AppText(
-                                text: 'Por: ${book.author.first}',
-                                fontSize: 11,
-                                color: Colors.grey[500]!,
+                            child: Center(
+                              child: AppText(
+                                text: '${index + 1}',
+                                fontSize: 14,
+                                fontWeight: 'bold',
+                                color: Colors.white,
                               ),
-                            ],
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-          ),
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          // Imagem de capa
+                          if (book.coverImage.isNotEmpty)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: Image.network(
+                                book.coverImage,
+                                width: 40,
+                                height: 60,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 40,
+                                    height: 60,
+                                    color: Colors.grey[300],
+                                    child: Icon(
+                                      Icons.book,
+                                      color: Colors.grey[600],
+                                      size: 24,
+                                    ),
+
+                                  );
+                                },
+                              ),
+                            ),
+
+                          const SizedBox(width: 15),
+                          // Informações do livro
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AppText(
+                                  text: book.title,
+                                  fontSize: 13,
+                                  fontWeight: 'medium',
+                                  color: Colors.black,
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    if (rating > 0) ...[
+                                      ...List.generate(5, (starIndex) {
+                                        return Icon(
+                                          Icons.star,
+                                          size: 14,
+                                          color: starIndex < rating.floor()
+                                              ? Colors.amber
+                                              : Colors.grey[300],
+                                        );
+                                      }),
+                                      const SizedBox(width: 8),
+                                      AppText(
+                                        text: rating.toStringAsFixed(1),
+                                        fontSize: 12,
+                                        fontWeight: 'medium',
+                                        color: Colors.grey[600]!,
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                                if (book.author.isNotEmpty) ...[
+                                  const SizedBox(height: 4),
+                                  AppText(
+                                    text: 'Por: ${book.author.join(", ")}',
+                                    fontSize: 11,
+                                    color: Colors.grey[500]!,
+                                  ),
+                                ],
+                              ],
+                            ),
+                         ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
         ],
       ),
     );
   }
 
-  Widget _buildAccessTrendsChart() {
+  Widget _buildBestRatedChart() {
+    // Limitar a 10 itens para o gráfico
+    final chartBooks = store.bestRatedBooks.take(10).toList();
+    
+    if (chartBooks.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(40),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: Column(
+            children: [
+              Icon(Icons.bar_chart, size: 64, color: Colors.grey),
+              SizedBox(height: 16),
+              AppText(
+                text: "Nenhum material avaliado encontrado",
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Verificar se há algum rating válido
+    final hasValidRatings = chartBooks.any((book) {
+      final rating = store.bookRatings[book.id] ?? 0.0;
+      return rating > 0.0;
+    });
+
     return Container(
-      height: 300,
+  
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -742,50 +862,143 @@ class _ManagePageState extends State<ManagePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AppText(
-            text: "Tendência de Acessos nos Últimos 7 Dias",
-            fontSize: 16,
-            fontWeight: 'bold',
-            color: Colors.black,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const AppText(
+                text: "Gráfico de Melhores Avaliados",
+                fontSize: 16,
+                fontWeight: 'bold',
+                color: Colors.black,
+              ),
+              // Filtros
+              Row(
+                children: [
+                  _buildFilterButton('Material', 'material'),
+                  const SizedBox(width: 10),
+                  _buildFilterButton('Autor', 'author'),
+                ],
+              ),
+            ],
           ),
           const SizedBox(height: 20),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(
-                  show: true,
-                  drawHorizontalLine: true,
-                  drawVerticalLine: false,
-                  horizontalInterval: 20,
-                  getDrawingHorizontalLine: (value) {
-                    return FlLine(
-                      color: Colors.grey[300]!,
-                      strokeWidth: 1,
-                    );
+          if (!hasValidRatings)
+            Container(
+              height: 350,
+              alignment: Alignment.center,
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.star_border, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  AppText(
+                    text: "Aguardando dados de avaliações...",
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 8),
+                  AppText(
+                    text: "Os ratings dos materiais estão sendo carregados",
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ],
+              ),
+            )
+          else
+            SizedBox(
+              height: 350,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: 5,
+                  minY: 0,
+                  barTouchData: BarTouchData(
+                    enabled: true,
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipColor: (group) => Colors.blueGrey.withOpacity(0.9),
+                    tooltipPadding: const EdgeInsets.all(8),
+                    tooltipMargin: 8,
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      final book = chartBooks[group.x.toInt()];
+                      final rating = store.bookRatings[book.id] ?? 0.0;
+                      
+                      return BarTooltipItem(
+                        '',
+                        const TextStyle(),
+                        children: [
+                          TextSpan(
+                            text: chartFilter == 'material' 
+                                ? '${book.title}\n' 
+                                : '${book.author.isNotEmpty ? book.author.first : "Autor desconhecido"}\n',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'Rating: ${rating.toStringAsFixed(1)} ⭐\n',
+                            style: const TextStyle(
+                              color: Colors.yellow,
+                              fontSize: 11,
+                            ),
+                          ),
+                          const TextSpan(
+                            text: '\nClique para ver detalhes',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 10,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  touchCallback: (FlTouchEvent event, barTouchResponse) {
+                    if (event is FlTapUpEvent && 
+                        barTouchResponse != null && 
+                        barTouchResponse.spot != null) {
+                      final index = barTouchResponse.spot!.touchedBarGroupIndex;
+                      if (index >= 0 && index < chartBooks.length) {
+                        final book = chartBooks[index];
+                        // Navegar para a página de detalhes
+                        Modular.to.pushNamed('/detail/${book.id}');
+                      }
+                    }
                   },
                 ),
                 titlesData: FlTitlesData(
                   show: true,
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 30,
-                      interval: 1,
+                      reservedSize: 80,
                       getTitlesWidget: (double value, TitleMeta meta) {
-                        const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
-                        if (value.toInt() >= 0 && value.toInt() < days.length) {
-                          return Text(
-                            days[value.toInt()],
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                        if (value.toInt() < chartBooks.length) {
+                          final book = chartBooks[value.toInt()];
+                          String text = chartFilter == 'material' 
+                              ? book.title 
+                              : (book.author.isNotEmpty ? book.author.first : "Desconhecido");
+                          
+                          // Truncar texto longo
+                          if (text.length > 15) {
+                            text = '${text.substring(0, 15)}...';
+                          }
+                          
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: RotatedBox(
+                              quarterTurns: -1,
+                              child: Text(
+                                text,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.start,
+                              ),
                             ),
                           );
                         }
@@ -796,83 +1009,101 @@ class _ManagePageState extends State<ManagePage> {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      interval: 20,
-                      getTitlesWidget: (double value, TitleMeta meta) {
+                      reservedSize: 40,
+                      interval: 1,
+                      getTitlesWidget: (value, meta) {
                         return Text(
-                          value.toInt().toString(),
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
+                          value.toStringAsFixed(0),
+                          style: const TextStyle(fontSize: 12),
                         );
                       },
-                      reservedSize: 32,
                     ),
+                  ),                 topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
                   ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                ),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: 1,
+                  getDrawingHorizontalLine: (value) {
+                    return FlLine(
+                      color: Colors.grey[300]!,
+                      strokeWidth: 1,
+                    );
+                  },
                 ),
                 borderData: FlBorderData(
                   show: true,
-                  border: Border.all(color: Colors.grey[300]!, width: 1),
-                ),
-                minX: 0,
-                maxX: 6,
-                minY: 0,
-                maxY: 120,
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: store.weeklyAccessData.isNotEmpty
-                        ? store.weeklyAccessData.asMap().entries
-                            .map((entry) => FlSpot(
-                                  entry.key.toDouble(),
-                                  entry.value.toDouble(),
-                                ))
-                            .toList()
-                        : [
-                            const FlSpot(0, 45),
-                            const FlSpot(1, 52),
-                            const FlSpot(2, 38),
-                            const FlSpot(3, 67),
-                            const FlSpot(4, 82),
-                            const FlSpot(5, 95),
-                            const FlSpot(6, 78),
-                          ],
-                    isCurved: true,
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.green.withOpacity(0.8),
-                        Colors.green.withOpacity(0.3),
-                      ],
-                    ),
-                    barWidth: 3,
-                    isStrokeCapRound: true,
-                    dotData: FlDotData(
-                      show: true,
-                      getDotPainter: (spot, percent, barData, index) =>
-                        FlDotCirclePainter(
-                          radius: 4,
-                          color: Colors.green,
-                          strokeWidth: 2,
-                          strokeColor: Colors.white,
-                        ),
-                    ),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.green.withOpacity(0.3),
-                          Colors.green.withOpacity(0.05),
-                        ],
-                      ),
-                    ),
+                  border: Border(
+                    left: BorderSide(color: Colors.grey[400]!),
+                    bottom: BorderSide(color: Colors.grey[400]!),
                   ),
-                ],
+                ),
+                barGroups: chartBooks.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final book = entry.value;
+                  final rating = store.bookRatings[book.id] ?? 0.0;
+                  
+                  return BarChartGroupData(
+                    x: index,
+                    barRods: [
+                      BarChartRodData(
+                        toY: rating,
+                        color: Colors.amber,
+                        width: 25,
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(4),
+                        ),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.amber.shade700,
+                            Colors.amber.shade300,
+                          ],
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                        ),
+
+                      ),
+                    ],
+                  );
+                }).toList(),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+    Widget _buildFilterButton(String label, String value) {
+    final isSelected = chartFilter == value;
+    
+    return InkWell(
+      onTap: () {
+        setState(() {
+          chartFilter = value;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.amber : Colors.grey[200],
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? Colors.amber.shade700 : Colors.grey[400]!,
+            width: 1,
+          ),
+        ),
+        child: AppText(
+          text: label,
+          fontSize: 12,
+          fontWeight: isSelected ? 'bold' : 'medium',
+          color: isSelected ? Colors.white : Colors.grey[700]!,
+        ),
       ),
     );
   }

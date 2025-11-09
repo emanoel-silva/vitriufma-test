@@ -10,8 +10,8 @@ class AppConst {
   }
   static const String appName = "Vitrine UFMA";
   static const double imageH = 18;
-  static const String API_URL = "http://localhost:8000";
-
+  static const String API_URL = "https://infomatviewer-9e8d.onrender.com";
+  static const String CLIENT_ID_GOOGLE ="428305704417-thbe459vht3ncepo5rj436545he5j704.apps.googleusercontent.com";
   static double sidePadding = 20;
   static double sideWindowWidth = 450;
   static double maxContainerWidth = 1080;
