@@ -11,6 +11,9 @@ import 'package:vitrine_ufma/app/core/store/auth/auth_store.dart';
 import 'package:vitrine_ufma/app/core/utils/screen_helper.dart';
 import 'package:universal_platform/universal_platform.dart';
 
+// Import condicional do NVDA helper
+import 'package:vitrine_ufma/app/core/utils/nvda_helper_stub.dart' if (dart.library.html) 'package:vitrine_ufma/app/core/utils/nvda_helper.dart';
+
 class AcessibilitiesPage extends StatefulWidget {
   const AcessibilitiesPage({super.key});
 
@@ -56,21 +59,14 @@ class _AcessibilitiesPageState extends State<AcessibilitiesPage> {
   
   void _toggleNVDA() {
     if (UniversalPlatform.isWeb) {
-      // Show information about NVDA since we can't directly control it from the browser
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Para usar o Leitor de Tela NVDA, baixe e instale o programa em nvda-project.org. '
-              'Após a instalação, ative-o usando as teclas Ctrl+Alt+N. '
-              'O NVDA irá ler automaticamente o conteúdo da página.'),
-          duration: Duration(seconds: 8),
-          action: SnackBarAction(
-            label: 'OK',
-            onPressed: () {
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            },
-          ),
-        ),
-      );
+      // Texto de exemplo para demonstração
+      final sampleText = 'Bem-vindo à Estante Visual da Biblioteca de Pinheiro. '
+          'Esta é uma plataforma acessível que oferece recursos para usuários com deficiência visual. '
+          'Você pode navegar utilizando as setas do teclado, pressionar Enter para ativar elementos '
+          'e utilizar o leitor de tela NVDA para ouvir o conteúdo da página.';
+      
+      // Alterna a visibilidade da área de texto do NVDA
+      NVDAHelper.toggleNVDAArea(sampleText);
     }
   }
 
