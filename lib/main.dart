@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -13,9 +14,13 @@ import 'app/app_widget.dart';
 // Import condicional do VLibras helper
 import 'app/core/utils/vlibras_helper_stub.dart' if (dart.library.html) 'app/core/utils/vlibras_helper.dart';
 
+// Import condicional do NVDA helper
+import 'app/core/utils/nvda_helper_stub.dart' if (dart.library.html) 'app/core/utils/nvda_helper.dart';
+
 void main() async {
   initializeDateFormatting();
   WidgetsFlutterBinding.ensureInitialized();
+  SemanticsBinding.instance.ensureSemantics();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.web);
   
   // Inicializa VLibras para web
@@ -49,7 +54,7 @@ void main() async {
     exit(1);
   }
   // }
-
+  
   runApp(
     ModularApp(
       module: AppModule(),

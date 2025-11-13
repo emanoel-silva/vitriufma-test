@@ -10,10 +10,17 @@ class NVDAHelper {
   static StreamSubscription? _dragEndSubscription;
   static StreamSubscription? _moveSubscription;
   static Timer? _autoCloseTimer; // Timer for auto-close functionality
+  
+  // Store text content for NVDA
+  static String _currentText = '';
+  static final List<String> _textQueue = [];
 
   /// Cria área de texto para leitura do NVDA
   static void createNVDAArea(String text) {
     try {
+      // Update current text
+      _currentText = text;
+      
       // Remove área anterior se existir
       final existing = html.document.querySelector('#nvda-translation-area');
       existing?.remove();
@@ -94,20 +101,46 @@ class NVDAHelper {
       // Adiciona eventos para arrastar
       _addDragFunctionality();
       
-      // Auto-remove após 15 segundos (opcional, pode ser removido se não quiser auto-close)
-      // _autoCloseTimer = Timer(Duration(seconds: 15), () {
-      //   if (_translationArea != null && _translationArea!.parent != null) {
-      //     removeNVDAArea();
-      //   }
-      // });
-      
       _isAreaVisible = true;
       
-      if (_debug) print('NVDA: Área de leitura criada');
+      if (_debug) print('NVDA: Área de leitura criada com texto: $text');
       
     } catch (e) {
       print('Erro ao criar área de leitura do NVDA: $e');
     }
+  }
+  
+  /// Atualiza o conteúdo da área de texto do NVDA
+  static void updateNVDAText(String text) {
+    if (!_isAreaVisible) return;
+    
+    try {
+      final textContent = html.document.querySelector('#nvda-translation-area div:nth-child(2)') as html.DivElement?;
+      if (textContent != null) {
+        textContent.text = text;
+        _currentText = text;
+        
+        if (_debug) print('NVDA: Texto atualizado para: $text');
+      }
+    } catch (e) {
+      print('Erro ao atualizar texto do NVDA: $e');
+    }
+  }
+  
+  /// Adiciona texto à fila do NVDA
+  static void addTextToQueue(String text) {
+    _textQueue.add(text);
+    
+    // Se a área está visível, atualiza imediatamente
+    if (_isAreaVisible) {
+      final combinedText = _textQueue.join('\n\n');
+      updateNVDAText(combinedText);
+    }
+  }
+  
+  /// Limpa a fila de textos
+  static void clearTextQueue() {
+    _textQueue.clear();
   }
   
   /// Remove a área de texto do NVDA
@@ -126,6 +159,7 @@ class NVDAHelper {
       
       _isAreaVisible = false;
       _translationArea = null;
+      _currentText = '';
       
       if (_debug) print('NVDA: Área de leitura removida');
       
@@ -135,16 +169,26 @@ class NVDAHelper {
   }
   
   /// Alterna a visibilidade da área de texto do NVDA
-  static void toggleNVDAArea(String text) {
+  static void toggleNVDAArea([String? text]) {
     if (_isAreaVisible) {
       removeNVDAArea();
     } else {
-      createNVDAArea(text);
+      final displayText = text ?? _currentText;
+      if (displayText.isNotEmpty) {
+        createNVDAArea(displayText);
+      } else if (_textQueue.isNotEmpty) {
+        createNVDAArea(_textQueue.join('\n\n'));
+      } else {
+        createNVDAArea('Conteúdo da página pronto para leitura com NVDA.');
+      }
     }
   }
   
   /// Verifica se a área está visível
   static bool get isAreaVisible => _isAreaVisible;
+  
+  /// Obtém o texto atual
+  static String get currentText => _currentText;
   
   /// Adiciona funcionalidade de arrastar
   static void _addDragFunctionality() {

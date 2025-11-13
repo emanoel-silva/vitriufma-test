@@ -8,6 +8,7 @@ import 'package:easy_rich_text/easy_rich_text.dart';
 import 'package:flutter/material.dart';
 import 'package:vitrine_ufma/app/core/components/vlibras_clickable_text.dart';
 import 'package:universal_platform/universal_platform.dart';
+import '../utils/nvda_helper_stub.dart' if (dart.library.html) '../utils/nvda_helper.dart';
 
 class AppText extends StatelessWidget {
   final String text;
@@ -26,6 +27,8 @@ class AppText extends StatelessWidget {
   final bool enableVLibras;
   final bool showVLibrasIcon;
   final String? vLibrasTooltip;
+  final bool enableNVDA;
+  
   const AppText({
     super.key,
     required this.text,
@@ -44,6 +47,7 @@ class AppText extends StatelessWidget {
     this.enableVLibras = true,
     this.showVLibrasIcon = false,
     this.vLibrasTooltip,
+    this.enableNVDA = true,
   });
 
   @override
@@ -94,6 +98,16 @@ class AppText extends StatelessWidget {
         ],
       ),
     );
+    
+    // Add text to NVDA queue if enabled and on web
+    if (enableNVDA && UniversalPlatform.isWeb) {
+      // Add text to NVDA helper queue when widget is built
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (NVDAHelper.isAreaVisible) {
+          NVDAHelper.addTextToQueue(text);
+        }
+      });
+    }
     
     // If VLibras is enabled and we're on web, wrap with VLibrasClickableWrapper
     if (enableVLibras && UniversalPlatform.isWeb) {
