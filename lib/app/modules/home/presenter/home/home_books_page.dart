@@ -181,15 +181,20 @@ class _HomeBooksPageState extends State<HomeBooksPage> {
                               itemCount: widget.store.filteredBooks.length,
                               itemBuilder: (context, index) {
                                 var book = widget.store.filteredBooks[index];
-                                return InkWell(
-                                    hoverColor: Colors.transparent,
-                                    focusColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    onTap: () {
-                                      widget.store.setSelectedBook(book);
-                                      // Get.toNamed("/book-view");
-                                    },
-                                    child: BookCard(book: book));
+                                return Semantics(
+                                  button: true,
+                                  label: 'Livro ${book.title}',
+                                  hint: 'Toque para ver detalhes do livro',
+                                  child: InkWell(
+                                      hoverColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () {
+                                        widget.store.setSelectedBook(book);
+                                        // Get.toNamed("/book-view");
+                                      },
+                                      child: BookCard(book: book)),
+                                );
                               },
                             );
                           }),
@@ -310,18 +315,23 @@ class _HomeBooksPageState extends State<HomeBooksPage> {
                     itemCount: widget.store.mostAccessedMaterials.length,
                     itemBuilder: (context, index) {
                       var book = widget.store.mostAccessedMaterials[index];
-                      return InkWell(
-                          hoverColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () {
-                            widget.store.setSelectedBook(book);
-                            print("Book: ${book.title}");
+                      return Semantics(
+                          button: true,
+                          label: 'Livro ${book.title}, Acessado ${book.accessCount} vezes',
+                          hint: 'Toque para ver detalhes',
+                          child: InkWell(
+                              hoverColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () {
+                                widget.store.setSelectedBook(book);
+                                print("Book: ${book.title}");
 
-                            Modular.to.pushNamed('/home/book/${book.id}',
-                                arguments: book);
-                          },
-                          child: BookCard(book: book));
+                                Modular.to.pushNamed('/home/book/${book.id}',
+                                    arguments: book);
+                              },
+                              child: BookCard(book: book)),
+                      );
                     },
                   ),
                 ),
@@ -384,18 +394,23 @@ class _HomeBooksPageState extends State<HomeBooksPage> {
                     itemCount: widget.store.topRatedMaterials.length,
                     itemBuilder: (context, index) {
                       var book = widget.store.topRatedMaterials[index];
-                      return InkWell(
-                          hoverColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () {
-                            widget.store.setSelectedBook(book);
-                            print("Book: ${book.title}");
+                      return Semantics(
+                          button: true,
+                          label: 'Livro ${book.title}, Avaliação ${book.rating} estrelas',
+                          hint: 'Toque para ver detalhes',
+                          child: InkWell(
+                              hoverColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () {
+                                widget.store.setSelectedBook(book);
+                                print("Book: ${book.title}");
 
-                            Modular.to.pushNamed('/home/book/${book.id}',
-                                arguments: book);
-                          },
-                          child: BookCard(book: book));
+                                Modular.to.pushNamed('/home/book/${book.id}',
+                                    arguments: book);
+                              },
+                              child: BookCard(book: book)),
+                      );
                     },
                   ),
                 ),
@@ -468,15 +483,20 @@ class _HomeBooksPageState extends State<HomeBooksPage> {
                               itemCount: books.length,
                               itemBuilder: (context, index) {
                                 var book = books[index];
-                                return InkWell(
-                                  hoverColor: Colors.transparent,
-                                  focusColor: Colors.transparent,
-                                  highlightColor: Colors.transparent,
-                                  onTap: () {
-                                    widget.store.setSelectedBook(book);
-                                    // Get.toNamed("/book-view");
-                                  },
-                                  child: BookCard(book: book),
+                                return Semantics(
+                                  button: true,
+                                  label: 'Livro relacionado ${book.title}',
+                                  hint: 'Toque para ver detalhes',
+                                  child: InkWell(
+                                    hoverColor: Colors.transparent,
+                                    focusColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () {
+                                      widget.store.setSelectedBook(book);
+                                      // Get.toNamed("/book-view");
+                                    },
+                                    child: BookCard(book: book),
+                                  ),
                                 );
                               },
                             ),

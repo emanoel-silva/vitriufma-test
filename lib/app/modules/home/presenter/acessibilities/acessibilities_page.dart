@@ -194,29 +194,7 @@ class _AcessibilitiesPageState extends State<AcessibilitiesPage> {
                       maxLines: 10,
                     ),
                     const SizedBox(height: 10),
-                    // Botão para ativar/desativar NVDA
-                    if (UniversalPlatform.isWeb)
-                      Container(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Implementar ativação/desativação do NVDA
-                            _toggleNVDA();
-                          },
-                          icon: Icon(Icons.hearing),
-                          label: Text('Ativar/Desativar Leitor de Tela NVDA'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green.shade600,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                    if (UniversalPlatform.isWeb)
-                      const SizedBox(height: 15),
+
                     // Caixa de texto para NVDA
                     Container(
                       padding: EdgeInsets.all(15),

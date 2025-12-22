@@ -80,40 +80,45 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
             ),
           ),
           const Spacer(),
-          InkWell(
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: UniversalPlatform.isWeb ? 
-                           VLibrasClickableText('Tamanho do texto', showIcon: false, tooltip: 'Passe o mouse para traduzir em Libras') :
-                           const Text('Tamanho do texto'),
-                    content: UniversalPlatform.isWeb ? 
-                             VLibrasClickableText(
-                               'Para aumentar ou diminuir a fonte no nosso site, utilize os atalhos Ctrl+ (para aumentar) e Ctrl- (para diminuir) no seu teclado. Caso queira restaurar o zoom para o tamanho original, basta pressionar as teclas "Ctrl" e "0" (zero) simultaneamente.',
-                               showIcon: false,
-                               tooltip: 'Passe o mouse para traduzir em Libras',
-                             ) :
-                             const Text(
-                               'Para aumentar ou diminuir a fonte no nosso site, utilize os atalhos Ctrl+ (para aumentar) e Ctrl- (para diminuir) no seu teclado. Caso queira restaurar o zoom para o tamanho original, basta pressionar as teclas "Ctrl" e "0" (zero) simultaneamente.'),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, 'OK'),
-                        child: UniversalPlatform.isWeb ? 
-                               VLibrasClickableText('OK', showIcon: false, tooltip: 'Passe o mouse para traduzir em Libras') :
-                               const Text('OK'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-            child: const AppText(
-              text: "A+|A-",
-              fontSize: 16,
-              fontWeight: 'bold',
-              color: Colors.black,
+          Semantics(
+            button: true,
+            label: 'Ajustar tamanho da fonte',
+            hint: 'Abre um diálogo com instruções para ajustar o zoom',
+            child: InkWell(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: UniversalPlatform.isWeb ? 
+                             VLibrasClickableText('Tamanho do texto', showIcon: false, tooltip: 'Passe o mouse para traduzir em Libras') :
+                             const Text('Tamanho do texto'),
+                      content: UniversalPlatform.isWeb ? 
+                               VLibrasClickableText(
+                                 'Para aumentar ou diminuir a fonte no nosso site, utilize os atalhos Ctrl+ (para aumentar) e Ctrl- (para diminuir) no seu teclado. Caso queira restaurar o zoom para o tamanho original, basta pressionar as teclas "Ctrl" e "0" (zero) simultaneamente.',
+                                 showIcon: false,
+                                 tooltip: 'Passe o mouse para traduzir em Libras',
+                               ) :
+                               const Text(
+                                 'Para aumentar ou diminuir a fonte no nosso site, utilize os atalhos Ctrl+ (para aumentar) e Ctrl- (para diminuir) no seu teclado. Caso queira restaurar o zoom para o tamanho original, basta pressionar as teclas "Ctrl" e "0" (zero) simultaneamente.'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, 'OK'),
+                          child: UniversalPlatform.isWeb ? 
+                                 VLibrasClickableText('OK', showIcon: false, tooltip: 'Passe o mouse para traduzir em Libras') :
+                                 const Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: const AppText(
+                text: "A+|A-",
+                fontSize: 16,
+                fontWeight: 'bold',
+                color: Colors.black,
+              ),
             ),
           ),
           const SizedBox(width: 20),
@@ -355,22 +360,27 @@ class _SideMenuState extends State<SideMenu> with RouteAware {
     required bool isSelected,
   }) {
     final theme = Theme.of(context).extension<ThemeCustom>()!;
-    return InkWell(
-      hoverColor: Colors.transparent,
-      focusColor: Colors.transparent,
-      splashColor: Colors.transparent,
-      onTap: () => Modular.to.navigate(route),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-            // horizontal: widget.isExpanded ? sidePadding : 0,
-            ),
-        child: AppText(
-          text: title,
-          fontSize: AppFontSize.fz06,
-          fontWeight: 'bold',
-          color: theme.textColor,
-          decoration:
-              isSelected ? TextDecoration.underline : TextDecoration.none,
+    return Semantics(
+      button: true,
+      label: 'Menu $title',
+      selected: isSelected,
+      child: InkWell(
+        hoverColor: Colors.transparent,
+        focusColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        onTap: () => Modular.to.navigate(route),
+        child: Container(
+          padding: EdgeInsets.symmetric(
+              // horizontal: widget.isExpanded ? sidePadding : 0,
+              ),
+          child: AppText(
+            text: title,
+            fontSize: AppFontSize.fz06,
+            fontWeight: 'bold',
+            color: theme.textColor,
+            decoration:
+                isSelected ? TextDecoration.underline : TextDecoration.none,
+          ),
         ),
       ),
     );
