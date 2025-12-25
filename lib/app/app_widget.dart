@@ -9,6 +9,7 @@ import 'package:vitrine_ufma/app/core/theme/app_theme_light.dart';
 import 'package:vitrine_ufma/app/core/utils/remove_scrollglow.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:vitrine_ufma/app/core/routes/vlibras_route_observer.dart';
+import 'package:vitrine_ufma/app/core/components/keyboard_navigation_wrapper.dart';
 
 class AppWidget extends StatefulWidget {
   const AppWidget({super.key});
@@ -84,16 +85,19 @@ class _AppWidgetState extends State<AppWidget> {
                   devicePixelRatio: 1,
                   textScaler: const TextScaler.linear(1.0),
                 ),
-                child: FocusScope(
-                  autofocus: true,
-                  child: Transform.scale(
-                    scale: 1,
-                    //  adjustScale(
-                    //   UniversalPlatform.isWeb
-                    //       ? getWebScale()
-                    //       : MediaQuery.of(context).devicePixelRatio,
-                    // ),
-                    child: child ?? const SizedBox(),
+                child: KeyboardNavigationWrapper(
+                  pageKey: 'main',
+                  child: FocusScope(
+                    autofocus: true,
+                    child: Transform.scale(
+                      scale: 1,
+                      //  adjustScale(
+                      //   UniversalPlatform.isWeb
+                      //       ? getWebScale()
+                      //       : MediaQuery.of(context).devicePixelRatio,
+                      // ),
+                      child: child ?? const SizedBox(),
+                    ),
                   ),
                 ),
               );

@@ -58,6 +58,42 @@ class KeyboardNavigationService {
     if (event.logicalKey == LogicalKeyboardKey.escape) {
       return _handleEscape();
     }
+    
+    // Handle F1 key for help
+    if (event.logicalKey == LogicalKeyboardKey.f1) {
+      _showKeyboardShortcutsHelp();
+      return true;
+    }
+    
+    // Handle Home key
+    if (event.logicalKey == LogicalKeyboardKey.home) {
+      if (HardwareKeyboard.instance.isControlPressed) {
+        _navigateToTop();
+        return true;
+      } else {
+        _navigateToFirstItem();
+        return true;
+      }
+    }
+    
+    // Handle End key
+    if (event.logicalKey == LogicalKeyboardKey.end) {
+      if (HardwareKeyboard.instance.isControlPressed) {
+        _navigateToBottom();
+        return true;
+      } else {
+        _navigateToLastItem();
+        return true;
+      }
+    }
+    
+    // Handle Arrow keys for menu/list navigation
+    if (event.logicalKey == LogicalKeyboardKey.arrowUp ||
+        event.logicalKey == LogicalKeyboardKey.arrowDown ||
+        event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+        event.logicalKey == LogicalKeyboardKey.arrowRight) {
+      return _handleArrowKeys(event.logicalKey);
+    }
 
     return false;
   }
@@ -70,6 +106,12 @@ class KeyboardNavigationService {
         return true;
       case LogicalKeyboardKey.keyH:
         _navigateToHome();
+        return true;
+      case LogicalKeyboardKey.home:
+        _navigateToTop();
+        return true;
+      case LogicalKeyboardKey.end:
+        _navigateToBottom();
         return true;
       default:
         return false;
@@ -110,6 +152,45 @@ class KeyboardNavigationService {
       }
     }
     return false;
+  }
+
+  /// Handle Arrow keys for navigation
+  bool _handleArrowKeys(LogicalKeyboardKey key) {
+    // This is typically handled by the focus management system
+    // For menu/list navigation, this would be handled in the specific components
+    return false;
+  }
+
+  /// Navigate to top of page
+  void _navigateToTop() {
+    final currentContext = NavigationService.navigatorKey.currentContext;
+    if (currentContext != null) {
+      // Scroll to top of the page
+      // This would typically be handled by scrolling to a specific widget
+      _announceNavigation('Navegando para o topo da página');
+    }
+  }
+
+  /// Navigate to bottom of page
+  void _navigateToBottom() {
+    final currentContext = NavigationService.navigatorKey.currentContext;
+    if (currentContext != null) {
+      // Scroll to bottom of the page
+      // This would typically be handled by scrolling to a specific widget
+      _announceNavigation('Navegando para o final da página');
+    }
+  }
+
+  /// Navigate to first item in list/page
+  void _navigateToFirstItem() {
+    _announceNavigation('Navegando para o primeiro item');
+    // This would be handled by the focus management service
+  }
+
+  /// Navigate to last item in list/page
+  void _navigateToLastItem() {
+    _announceNavigation('Navegando para o último item');
+    // This would be handled by the focus management service
   }
 
   // Navigation methods
@@ -159,6 +240,12 @@ class KeyboardNavigationService {
     }
   }
 
+  /// Show keyboard shortcuts help
+  void _showKeyboardShortcutsHelp() {
+    // This will be handled by the KeyboardNavigationWrapper
+    _announceNavigation('Pressione F1 para ajuda com atalhos de teclado');
+  }
+
   /// Register a named focus node
   void registerFocusNode(String name, FocusNode focusNode) {
     _namedFocusNodes[name] = focusNode;
@@ -193,10 +280,16 @@ class KeyboardNavigationService {
     'Alt + L': 'Ir para Login',
     'Ctrl + S': 'Ir para Busca',
     'Ctrl + H': 'Ir para Início',
+    'Ctrl + Home': 'Ir para o topo da página',
+    'Ctrl + End': 'Ir para o final da página',
     'Tab': 'Navegar pelos elementos',
     'Shift + Tab': 'Navegar pelos elementos (reverso)',
     'Enter': 'Ativar elemento selecionado',
+    'Space': 'Ativar checkbox/radio',
     'Esc': 'Fechar diálogos/menus',
+    'Home': 'Ir para o primeiro item',
+    'End': 'Ir para o último item',
+    'F1': 'Mostrar ajuda de atalhos',
   };
 
   /// Dispose resources

@@ -17,6 +17,9 @@ import 'app/core/utils/vlibras_helper_stub.dart' if (dart.library.html) 'app/cor
 // Import condicional do NVDA helper
 import 'app/core/utils/nvda_helper_stub.dart' if (dart.library.html) 'app/core/utils/nvda_helper.dart';
 
+// Import keyboard navigation service
+import 'app/core/services/keyboard_navigation_service.dart';
+
 void main() async {
   initializeDateFormatting();
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +37,9 @@ void main() async {
         VLibrasHelper.debug();
       });
     });
+    
+    // Initialize keyboard navigation service
+    KeyboardNavigationService().initialize();
   }
   
   if (!UniversalPlatform.isWeb) {

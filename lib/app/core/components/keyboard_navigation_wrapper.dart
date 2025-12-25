@@ -96,6 +96,7 @@ class _KeyboardNavigationWrapperState extends State<KeyboardNavigationWrapper> {
   bool _handleFocusShortcuts(KeyEvent event) {
     final isCtrlPressed = HardwareKeyboard.instance.isControlPressed;
     final isShiftPressed = HardwareKeyboard.instance.isShiftPressed;
+    final isAltPressed = HardwareKeyboard.instance.isAltPressed;
 
     switch (event.logicalKey) {
       case LogicalKeyboardKey.tab:
@@ -106,33 +107,56 @@ class _KeyboardNavigationWrapperState extends State<KeyboardNavigationWrapper> {
         }
         return true;
 
+      case LogicalKeyboardKey.enter:
+        // Enter is typically handled by the focused widget
+        return false;
+
+      case LogicalKeyboardKey.space:
+        // Space is typically handled by the focused widget
+        return false;
+
+      case LogicalKeyboardKey.escape:
+        // Escape is handled by the keyboard service
+        return false;
+
       case LogicalKeyboardKey.home:
         if (isCtrlPressed) {
+          // Ctrl + Home: Navigate to top of screen
+          _focusService.focusFirst(pageKey: widget.pageKey);
+          return true;
+        } else {
+          // Home: Navigate to first item
           _focusService.focusFirst(pageKey: widget.pageKey);
           return true;
         }
-        break;
 
       case LogicalKeyboardKey.end:
         if (isCtrlPressed) {
+          // Ctrl + End: Navigate to bottom of screen
+          _focusService.focusLast(pageKey: widget.pageKey);
+          return true;
+        } else {
+          // End: Navigate to last item
           _focusService.focusLast(pageKey: widget.pageKey);
           return true;
         }
-        break;
 
       case LogicalKeyboardKey.arrowUp:
-        if (isCtrlPressed) {
-          _focusService.focusPrevious(pageKey: widget.pageKey);
-          return true;
-        }
-        break;
-
       case LogicalKeyboardKey.arrowDown:
+      case LogicalKeyboardKey.arrowLeft:
+      case LogicalKeyboardKey.arrowRight:
+        // Arrow keys are typically handled by specific components like lists/menus
+        // but we can implement basic focus navigation if needed
         if (isCtrlPressed) {
-          _focusService.focusNext(pageKey: widget.pageKey);
-          return true;
+          if (event.logicalKey == LogicalKeyboardKey.arrowUp || event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+            _focusService.focusPrevious(pageKey: widget.pageKey);
+            return true;
+          } else if (event.logicalKey == LogicalKeyboardKey.arrowDown || event.logicalKey == LogicalKeyboardKey.arrowRight) {
+            _focusService.focusNext(pageKey: widget.pageKey);
+            return true;
+          }
         }
-        break;
+        return false;
 
       case LogicalKeyboardKey.f1:
         _showKeyboardShortcutsHelp();
