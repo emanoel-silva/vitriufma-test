@@ -4,17 +4,20 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:vitrine_ufma/app/app_widget.dart';
 
-/// Service to handle global keyboard navigation and shortcuts
+// Importa helper condicional do NVDA
+import 'package:vitrine_ufma/app/core/utils/nvda_helper_stub.dart' if (dart.library.html) 'package:vitrine_ufma/app/core/utils/nvda_helper.dart';
+
+/// Serviço para lidar com navegação por teclado global e atalhos
 class KeyboardNavigationService {
   static final KeyboardNavigationService _instance = KeyboardNavigationService._internal();
   factory KeyboardNavigationService() => _instance;
   KeyboardNavigationService._internal();
 
-  // Focus management
+  // Gerenciamento de foco
   final Map<String, FocusNode> _namedFocusNodes = {};
   FocusNode? _currentFocus;
   
-  // Navigation shortcuts
+  // Atalhos de navegação
   static const Map<String, LogicalKeyboardKey> _shortcuts = {
     'home': LogicalKeyboardKey.keyH,
     'about': LogicalKeyboardKey.keyA,
@@ -25,47 +28,52 @@ class KeyboardNavigationService {
     'escape': LogicalKeyboardKey.escape,
   };
 
-  /// Initialize keyboard navigation service
+  /// Inicializa o serviço de navegação por teclado
   void initialize() {
     if (!UniversalPlatform.isWeb) return;
     
-    // Enable semantic mode for better screen reader support
+    // Habilita modo semântico para melhor suporte ao leitor de tela
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setupGlobalShortcuts();
     });
   }
 
-  /// Setup global keyboard shortcuts
+  /// Configura atalhos de teclado globais
   void _setupGlobalShortcuts() {
-    // This will be handled at the widget level using RawKeyboardListener
+    // Isso será tratado no nível do widget usando RawKeyboardListener
   }
 
-  /// Handle keyboard events
+  /// Trata eventos de teclado
   bool handleKeyEvent(KeyEvent event) {
     if (event is! KeyDownEvent) return false;
 
-    // Handle Ctrl+Key shortcuts
+    // Trata atalhos Ctrl+Alt+Tecla
+    if (HardwareKeyboard.instance.isControlPressed && HardwareKeyboard.instance.isAltPressed) {
+      return _handleCtrlAltShortcuts(event.logicalKey);
+    }
+    
+    // Trata atalhos Ctrl+Tecla
     if (HardwareKeyboard.instance.isControlPressed) {
       return _handleControlShortcuts(event.logicalKey);
     }
 
-    // Handle Alt+Key shortcuts for navigation
+    // Trata atalhos Alt+Tecla para navegação
     if (HardwareKeyboard.instance.isAltPressed) {
       return _handleAltShortcuts(event.logicalKey);
     }
 
-    // Handle Escape key
+    // Trata tecla Escape
     if (event.logicalKey == LogicalKeyboardKey.escape) {
       return _handleEscape();
     }
     
-    // Handle F1 key for help
+    // Trata tecla F1 para ajuda
     if (event.logicalKey == LogicalKeyboardKey.f1) {
       _showKeyboardShortcutsHelp();
       return true;
     }
     
-    // Handle Home key
+    // Trata tecla Home
     if (event.logicalKey == LogicalKeyboardKey.home) {
       if (HardwareKeyboard.instance.isControlPressed) {
         _navigateToTop();
@@ -76,7 +84,7 @@ class KeyboardNavigationService {
       }
     }
     
-    // Handle End key
+    // Trata tecla End
     if (event.logicalKey == LogicalKeyboardKey.end) {
       if (HardwareKeyboard.instance.isControlPressed) {
         _navigateToBottom();
@@ -87,7 +95,7 @@ class KeyboardNavigationService {
       }
     }
     
-    // Handle Arrow keys for menu/list navigation
+    // Trata teclas de seta para navegação em menu/lista
     if (event.logicalKey == LogicalKeyboardKey.arrowUp ||
         event.logicalKey == LogicalKeyboardKey.arrowDown ||
         event.logicalKey == LogicalKeyboardKey.arrowLeft ||
@@ -98,7 +106,7 @@ class KeyboardNavigationService {
     return false;
   }
 
-  /// Handle Control+Key shortcuts
+  /// Trata atalhos Control+Tecla
   bool _handleControlShortcuts(LogicalKeyboardKey key) {
     switch (key) {
       case LogicalKeyboardKey.keyS:
@@ -118,7 +126,7 @@ class KeyboardNavigationService {
     }
   }
 
-  /// Handle Alt+Key shortcuts for main navigation
+  /// Trata atalhos Alt+Tecla para navegação principal
   bool _handleAltShortcuts(LogicalKeyboardKey key) {
     switch (key) {
       case LogicalKeyboardKey.keyH:
@@ -141,11 +149,30 @@ class KeyboardNavigationService {
     }
   }
 
-  /// Handle Escape key
+  /// Trata atalhos Ctrl+Alt+Tecla
+  bool _handleCtrlAltShortcuts(LogicalKeyboardKey key) {
+    switch (key) {
+      case LogicalKeyboardKey.keyN:
+        _toggleNVDA();
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /// Alternar leitor de tela NVDA
+  void _toggleNVDA() {
+    if (UniversalPlatform.isWeb) {
+      NVDAHelper.toggleNVDAArea();
+      _announceNavigation('NVDA ativado/desativado');
+    }
+  }
+
+  /// Trata tecla Escape
   bool _handleEscape() {
     final currentContext = NavigationService.navigatorKey.currentContext;
     if (currentContext != null) {
-      // Close any open dialogs or sheets
+      // Fecha quaisquer diálogos ou folhas abertos
       if (Navigator.canPop(currentContext)) {
         Navigator.pop(currentContext);
         return true;
@@ -154,46 +181,46 @@ class KeyboardNavigationService {
     return false;
   }
 
-  /// Handle Arrow keys for navigation
+  /// Trata teclas de seta para navegação
   bool _handleArrowKeys(LogicalKeyboardKey key) {
-    // This is typically handled by the focus management system
-    // For menu/list navigation, this would be handled in the specific components
+    // Isso normalmente é tratado pelo sistema de gerenciamento de foco
+    // Para navegação em menu/lista, isso seria tratado nos componentes específicos
     return false;
   }
 
-  /// Navigate to top of page
+  /// Navega para o topo da página
   void _navigateToTop() {
     final currentContext = NavigationService.navigatorKey.currentContext;
     if (currentContext != null) {
-      // Scroll to top of the page
-      // This would typically be handled by scrolling to a specific widget
+      // Rola para o topo da página
+      // Isso normalmente seria tratado rolando para um widget específico
       _announceNavigation('Navegando para o topo da página');
     }
   }
 
-  /// Navigate to bottom of page
+  /// Navega para o final da página
   void _navigateToBottom() {
     final currentContext = NavigationService.navigatorKey.currentContext;
     if (currentContext != null) {
-      // Scroll to bottom of the page
-      // This would typically be handled by scrolling to a specific widget
+      // Rola para o final da página
+      // Isso normalmente seria tratado rolando para um widget específico
       _announceNavigation('Navegando para o final da página');
     }
   }
 
-  /// Navigate to first item in list/page
+  /// Navega para o primeiro item na lista/página
   void _navigateToFirstItem() {
     _announceNavigation('Navegando para o primeiro item');
-    // This would be handled by the focus management service
+    // Isso seria tratado pelo serviço de gerenciamento de foco
   }
 
-  /// Navigate to last item in list/page
+  /// Navega para o último item na lista/página
   void _navigateToLastItem() {
     _announceNavigation('Navegando para o último item');
-    // This would be handled by the focus management service
+    // Isso seria tratado pelo serviço de gerenciamento de foco
   }
 
-  // Navigation methods
+  // Métodos de navegação
   void _navigateToHome() {
     Modular.to.navigate('/home/books');
     _announceNavigation('Navegando para Início');
@@ -224,7 +251,7 @@ class KeyboardNavigationService {
     _announceNavigation('Navegando para Busca');
   }
 
-  /// Announce navigation for screen readers
+  /// Anuncia navegação para leitores de tela
   void _announceNavigation(String message) {
     final currentContext = NavigationService.navigatorKey.currentContext;
     if (currentContext != null) {
@@ -240,23 +267,23 @@ class KeyboardNavigationService {
     }
   }
 
-  /// Show keyboard shortcuts help
+  /// Mostra ajuda de atalhos de teclado
   void _showKeyboardShortcutsHelp() {
-    // This will be handled by the KeyboardNavigationWrapper
+    // Isso será tratado pelo KeyboardNavigationWrapper
     _announceNavigation('Pressione F1 para ajuda com atalhos de teclado');
   }
 
-  /// Register a named focus node
+  /// Registra um nó de foco nomeado
   void registerFocusNode(String name, FocusNode focusNode) {
     _namedFocusNodes[name] = focusNode;
   }
 
-  /// Unregister a named focus node
+  /// Remove o registro de um nó de foco nomeado
   void unregisterFocusNode(String name) {
     _namedFocusNodes.remove(name);
   }
 
-  /// Focus on a named node
+  /// Foca em um nó nomeado
   void focusOn(String name) {
     final focusNode = _namedFocusNodes[name];
     if (focusNode != null) {
@@ -265,13 +292,13 @@ class KeyboardNavigationService {
     }
   }
 
-  /// Get current focus node
+  /// Obtém o nó de foco atual
   FocusNode? get currentFocus => _currentFocus;
 
-  /// Check if keyboard navigation is supported
+  /// Verifica se a navegação por teclado é suportada
   bool get isSupported => UniversalPlatform.isWeb;
 
-  /// Get available shortcuts as help text
+  /// Obtém atalhos disponíveis como texto de ajuda
   Map<String, String> get availableShortcuts => {
     'Alt + H': 'Ir para Início',
     'Alt + A': 'Ir para Sobre',
@@ -282,6 +309,7 @@ class KeyboardNavigationService {
     'Ctrl + H': 'Ir para Início',
     'Ctrl + Home': 'Ir para o topo da página',
     'Ctrl + End': 'Ir para o final da página',
+    'Ctrl + Alt + N': 'Ativar/desativar NVDA',
     'Tab': 'Navegar pelos elementos',
     'Shift + Tab': 'Navegar pelos elementos (reverso)',
     'Enter': 'Ativar elemento selecionado',
@@ -292,7 +320,7 @@ class KeyboardNavigationService {
     'F1': 'Mostrar ajuda de atalhos',
   };
 
-  /// Dispose resources
+  /// Descarta recursos
   void dispose() {
     _namedFocusNodes.clear();
     _currentFocus = null;

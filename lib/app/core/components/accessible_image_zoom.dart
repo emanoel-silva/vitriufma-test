@@ -225,13 +225,35 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
             child: Center(
               child: LayoutBuilder(
                 builder: (context, constraints) {
+                  final mediaQuery = MediaQuery.of(context);
+                  final screenSize = mediaQuery.size;
+                  final orientation = mediaQuery.orientation;
+                  
                   // Calculate responsive constraints based on screen size
-                  final maxWidth = constraints.maxWidth * 0.9;
-                  final maxHeight = constraints.maxHeight * 0.9;
+                  double maxWidth = screenSize.width * 0.9;
+                  double maxHeight = screenSize.height * 0.9;
+                  
+                  // Adjust constraints based on orientation
+                  if (orientation == Orientation.portrait) {
+                    maxHeight = screenSize.height * 0.85;
+                    maxWidth = screenSize.width * 0.95;
+                  } else {
+                    maxHeight = screenSize.height * 0.8;
+                    maxWidth = screenSize.width * 0.7;
+                  }
                   
                   // Ensure minimum size for very small screens
-                  final minWidth = MediaQuery.of(context).size.width * 0.5;
-                  final minHeight = MediaQuery.of(context).size.height * 0.5;
+                  final minWidth = screenSize.width * 0.4;
+                  final minHeight = screenSize.height * 0.4;
+                  
+                  // For mobile devices, use more restrictive sizing
+                  if (screenSize.width < 600) {
+                    maxWidth = screenSize.width * 0.95;
+                    maxHeight = screenSize.height * 0.7;
+                  } else if (screenSize.width < 1024) {
+                    maxWidth = screenSize.width * 0.85;
+                    maxHeight = screenSize.height * 0.8;
+                  }
                   
                   return ConstrainedBox(
                     constraints: BoxConstraints(
@@ -242,8 +264,8 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
                     ),
                     child: InteractiveViewer(
                       transformationController: _transformationController,
-                      boundaryMargin: const EdgeInsets.all(20),
-                      minScale: 0.5,
+                      boundaryMargin: EdgeInsets.all(orientation == Orientation.portrait ? 10 : 20),
+                      minScale: 0.1,
                       maxScale: 10, // Keep max scale for zooming capabilities
                       onInteractionEnd: (details) {
                         // Reset scale when double tapping

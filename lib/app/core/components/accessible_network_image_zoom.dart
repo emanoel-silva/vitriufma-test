@@ -272,9 +272,10 @@ class _NetworkImageZoomDialogState extends State<_NetworkImageZoomDialog> with W
                       },
                       child: Image.network(
                         widget.imageUrl,
-                        width: widget.width,
-                        height: widget.height,
-                        fit: widget.fit ?? BoxFit.contain,
+                        // Ignore width/height passed from parent for modal view
+                        // width: widget.width,
+                        // height: widget.height,
+                        fit: BoxFit.contain, // Ensure it fits the screen
                         loadingBuilder: widget.loadingBuilder,
                         errorBuilder: widget.errorBuilder,
                         filterQuality: FilterQuality.high,
