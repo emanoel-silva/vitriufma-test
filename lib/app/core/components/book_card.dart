@@ -41,7 +41,7 @@ class BookCard extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   child: AccessibleNetworkImageZoom(
                     imageUrl: book.coverImage,
-                    altText: 'Capa do livro ${book.title}',
+                    altText: book.altText ?? 'Capa do livro ${book.title}',
                     width: 120,
                     height: 160,
                     fit: BoxFit.cover,

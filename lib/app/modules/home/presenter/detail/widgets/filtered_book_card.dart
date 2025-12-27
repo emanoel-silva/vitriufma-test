@@ -71,7 +71,7 @@ class FilteredBookCard extends StatelessWidget {
                 clipBehavior: Clip.antiAlias,
                 child: AccessibleNetworkImageZoom(
                   imageUrl: book.coverImage,
-                  altText: 'Capa do livro ${book.title}',
+                  altText: book.altText ?? 'Capa do livro ${book.title}',
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     // Return a placeholder image or a custom error widget

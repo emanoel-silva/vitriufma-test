@@ -39,6 +39,7 @@ abstract class _RegisterMaterialStoreBase with Store {
   TextEditingController? avaliabilityController = TextEditingController();
   TextEditingController resumeController = TextEditingController();
   TextEditingController? subject1Controller = TextEditingController();
+  TextEditingController altTextController = TextEditingController();
   String? coverImageURL;
   String? sumaryURL;
 
@@ -116,6 +117,7 @@ abstract class _RegisterMaterialStoreBase with Store {
     subject1Controller!.text = book.tags.join(',');
     coverImageURL = book.coverImage;
     sumaryURL = book.summary;
+    altTextController.text = book.altText ?? "";
   }
 
   //CRIA JSON DO LIVRO
@@ -150,6 +152,7 @@ abstract class _RegisterMaterialStoreBase with Store {
       'series': '0',
       'edition': editionController.text,
       'reprint_update': rePrintingController?.text ?? "0",
+      'alt_text': altTextController.text,
     };
   }
 
@@ -360,6 +363,7 @@ abstract class _RegisterMaterialStoreBase with Store {
     fileSumary = <int>[].asObservable();
     fileName = null;
     fileNameSumary = null;
+    altTextController.clear();
   }
 
   // UPLOAD FILE AND IMAGE

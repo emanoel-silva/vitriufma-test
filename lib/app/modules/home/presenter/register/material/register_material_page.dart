@@ -271,6 +271,12 @@ class _RegisterMaterialPageState extends State<RegisterMaterialPage> {
                                 label: 'Sumário',
                                 isValid: store.isSumaryValid,
                                 cover: false),
+                            _buildField(
+                              label: 'Descrição da Imagem (Alt Text)',
+                              hint: 'Descrição para acessibilidade',
+                              controller: store.altTextController,
+                              width: columnWidth,
+                            ),
                           ],
                         ),
                       ),

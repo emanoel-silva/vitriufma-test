@@ -187,7 +187,7 @@ class _DetailPageState extends State<DetailPage> {
                     height: 400,
                     child: AccessibleNetworkImageZoom(
                       imageUrl: book!.coverImage,
-                      altText: 'Capa do livro ${book!.title}',
+                      altText: book!.altText ?? 'Capa do livro ${book!.title}',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(

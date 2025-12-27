@@ -21,6 +21,7 @@ class Book {
   String edition;
   String reprintUpdate;
   int id;
+  String? altText;
 
   Book({
     required this.title,
@@ -45,6 +46,7 @@ class Book {
     required this.edition,
     required this.reprintUpdate,
     required this.id,
+    this.altText,
   });
 
   factory Book.fromJson(Map<String, dynamic> json) {
@@ -71,6 +73,7 @@ class Book {
       edition: json['edition'] ?? '',
       reprintUpdate: json['reprint_update'] ?? '',
       id: json['id'] ?? 0,
+      altText: json['alt_text'],
     );
   }
 
@@ -110,6 +113,7 @@ class Book {
       'edition': edition,
       'reprint_update': reprintUpdate,
       'id': id,
+      'alt_text': altText,
     };
   }
 
