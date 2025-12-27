@@ -66,7 +66,7 @@ class CustomAlertDialog extends StatelessWidget {
                                   SizedBox(
                                     height: (10),
                                   ),
-                                  // Use VLibras hoverable text on web, regular text on other platforms
+                                  // Usa texto com VLibras pairável na web, texto normal em outras plataformas
                                   UniversalPlatform.isWeb ? 
                                   VLibrasClickableText(
                                     "Atenção!",
@@ -89,7 +89,7 @@ class CustomAlertDialog extends StatelessWidget {
                                   SizedBox(
                                     height: (15),
                                   ),
-                                  // Use VLibras hoverable text on web, regular text on other platforms
+                                  // Usa texto com VLibras pairável na web, texto normal em outras plataformas
                                   UniversalPlatform.isWeb ? 
                                   VLibrasClickableText(
                                     title,
@@ -103,7 +103,7 @@ class CustomAlertDialog extends StatelessWidget {
                                     tooltip: 'Passe o mouse para traduzir em Libras',
                                   ) :
                                   Text(
-                                    title, //'Você tem certeza que deseja sair?',
+                                    title, //'Você tem certeza que deseja sair?'
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: AppColors.black,

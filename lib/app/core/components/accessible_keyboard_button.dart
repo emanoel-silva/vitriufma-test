@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/semantics.dart';
 
-/// An accessible button that properly handles all keyboard interactions
+
+/// Um botão acessível que lida corretamente com todas as interações de teclado
+
 /// Supports:
-/// - Enter key activation
-/// - Space key activation
-/// - Proper focus management
-/// - Screen reader announcements
+
+/// - Ativação pela tecla Enter
+/// - Ativação pela tecla Espaço
+
+/// - Gerenciamento adequado de foco
+/// - Anúncios para leitores de tela
+
 class AccessibleKeyboardButton extends StatefulWidget {
   final VoidCallback? onPressed;
   final VoidCallback? onLongPress;
@@ -84,12 +89,14 @@ class _AccessibleKeyboardButtonState extends State<AccessibleKeyboardButton> {
     if (widget.onPressed != null && widget.enabled) {
       widget.onPressed!();
       
-      // Provide haptic feedback
+
+      // Fornece feedback tátil
       if (widget.enableFeedback) {
         Feedback.forTap(context);
       }
       
-      // Announce to screen readers
+
+      // Anuncia para leitores de tela
       if (widget.semanticsLabel != null) {
         SemanticsService.announce('${widget.semanticsLabel} ativado', TextDirection.ltr);
       }
@@ -100,12 +107,14 @@ class _AccessibleKeyboardButtonState extends State<AccessibleKeyboardButton> {
     if (widget.onLongPress != null && widget.enabled) {
       widget.onLongPress!();
       
-      // Provide haptic feedback
+
+      // Fornece feedback tátil
       if (widget.enableFeedback) {
         Feedback.forLongPress(context);
       }
       
-      // Announce to screen readers
+
+      // Anuncia para leitores de tela
       if (widget.semanticsLabel != null) {
         SemanticsService.announce('${widget.semanticsLabel} pressionado longamente', TextDirection.ltr);
       }
@@ -114,7 +123,8 @@ class _AccessibleKeyboardButtonState extends State<AccessibleKeyboardButton> {
 
   void _handleKeyDown(RawKeyEvent event) {
     if (event is RawKeyDownEvent) {
-      // Handle Enter and Space key activation
+
+      // Trata a ativação pelas teclas Enter e Espaço
       if (event.logicalKey == LogicalKeyboardKey.enter || 
           event.logicalKey == LogicalKeyboardKey.space) {
         _handlePress();
@@ -124,21 +134,24 @@ class _AccessibleKeyboardButtonState extends State<AccessibleKeyboardButton> {
 
   @override
   Widget build(BuildContext context) {
-    // Determine button style based on parameters
+
+    // Determina o estilo do botão com base nos parâmetros
     ButtonStyle buttonStyle = widget.style ?? 
         ButtonStyle(
-          // Minimum size for adequate touch target (44x44 pixels recommended)
+
+          // Tamanho mínimo para um alvo de toque adequado (44x44 pixels recomendado)
           minimumSize: MaterialStateProperty.all<Size>(
             Size(
               widget.minWidth ?? 44.0,
               widget.minHeight ?? 44.0,
             ),
           ),
-          // Proper padding
+          // Preenchimento adequado
           padding: MaterialStateProperty.all<EdgeInsets>(
             widget.padding ?? const EdgeInsets.all(12.0),
           ),
-          // Background color
+
+          // Cor de fundo
           backgroundColor: MaterialStateProperty.resolveWith<Color>(
             (Set<MaterialState> states) {
               if (states.contains(MaterialState.disabled)) {
@@ -152,7 +165,8 @@ class _AccessibleKeyboardButtonState extends State<AccessibleKeyboardButton> {
               return widget.backgroundColor ?? Theme.of(context).primaryColor;
             },
           ),
-          // Foreground color
+
+          // Cor de primeiro plano
           foregroundColor: MaterialStateProperty.resolveWith<Color>(
             (Set<MaterialState> states) {
               if (states.contains(MaterialState.disabled)) {
@@ -162,7 +176,8 @@ class _AccessibleKeyboardButtonState extends State<AccessibleKeyboardButton> {
               return widget.foregroundColor ?? Colors.white;
             },
           ),
-          // Border
+
+          // Borda
           side: MaterialStateProperty.all<BorderSide>(
             widget.borderSide ??
                 BorderSide(
@@ -170,18 +185,20 @@ class _AccessibleKeyboardButtonState extends State<AccessibleKeyboardButton> {
                   width: 1.0,
                 ),
           ),
-          // Shape
+
+          // forma
           shape: MaterialStateProperty.all<OutlinedBorder>(
             widget.shape ??
                 RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
           ),
-          // Elevation
+
+          // Elevação
           elevation: MaterialStateProperty.all<double>(
             widget.elevation ?? 2.0,
           ),
-          // Focus overlay
+          // Overlay de foco
           overlayColor: MaterialStateProperty.resolveWith<Color?>(
             (Set<MaterialState> states) {
               if (states.contains(MaterialState.focused)) {
@@ -197,7 +214,8 @@ class _AccessibleKeyboardButtonState extends State<AccessibleKeyboardButton> {
           ),
         );
 
-    // Create the button widget
+    // Cria o widget do botão
+
     Widget button = ElevatedButton(
       onPressed: widget.enabled ? _handlePress : null,
       onLongPress: widget.enabled ? _handleLongPress : null,
@@ -207,7 +225,8 @@ class _AccessibleKeyboardButtonState extends State<AccessibleKeyboardButton> {
       child: widget.child,
     );
 
-    // Add tooltip if provided
+
+    // Adiciona tooltip se fornecido
     if (widget.tooltip != null) {
       button = Tooltip(
         message: widget.tooltip!,
@@ -215,14 +234,16 @@ class _AccessibleKeyboardButtonState extends State<AccessibleKeyboardButton> {
       );
     }
 
-    // Wrap in RawKeyboardListener for keyboard activation
+
+    // Adiciona RawKeyboardListener para ativação por teclado
     button = RawKeyboardListener(
       focusNode: _focusNode,
       onKey: _handleKeyDown,
       child: button,
     );
 
-    // Wrap in Semantics for accessibility information
+    // Adiciona Semantics para informações de acessibilidade
+
     return Semantics(
       button: true,
       label: widget.semanticsLabel,

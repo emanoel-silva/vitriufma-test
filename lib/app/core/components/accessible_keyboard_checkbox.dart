@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/semantics.dart';
 
-/// An accessible checkbox that properly handles all keyboard interactions
+
+/// Uma caixa de seleção acessível que lida adequadamente com todas as interações de teclado
 /// Supports:
 /// - Space key activation
 /// - Enter key activation
@@ -76,12 +77,14 @@ class _AccessibleKeyboardCheckboxState extends State<AccessibleKeyboardCheckbox>
       final newValue = !widget.value;
       widget.onChanged!(newValue);
       
-      // Provide haptic feedback
+
+      // Fornece feedback tátil
       if (widget.enableFeedback) {
         Feedback.forTap(context);
       }
       
-      // Announce to screen readers
+
+      // Anuncia para leitores de tela
       if (widget.semanticsLabel != null) {
         final state = newValue ? 'marcado' : 'desmarcado';
         SemanticsService.announce('${widget.semanticsLabel} $state', TextDirection.ltr);
@@ -91,7 +94,8 @@ class _AccessibleKeyboardCheckboxState extends State<AccessibleKeyboardCheckbox>
 
   void _handleKeyDown(RawKeyEvent event) {
     if (event is RawKeyDownEvent) {
-      // Handle Space and Enter key activation
+      // Trata a ativação pelas teclas Espaço e Enter
+
       if (event.logicalKey == LogicalKeyboardKey.space || 
           event.logicalKey == LogicalKeyboardKey.enter) {
         _handleChange();
@@ -101,7 +105,7 @@ class _AccessibleKeyboardCheckboxState extends State<AccessibleKeyboardCheckbox>
 
   @override
   Widget build(BuildContext context) {
-    // Create the checkbox widget
+    // Cria o widget de checkbox
     Widget checkbox = Checkbox(
       value: widget.value,
       onChanged: widget.enabled ? (widget.onChanged != null ? (_) => _handleChange() : null) : null,
@@ -115,7 +119,8 @@ class _AccessibleKeyboardCheckboxState extends State<AccessibleKeyboardCheckbox>
       visualDensity: VisualDensity.compact,
     );
 
-    // Add padding if provided
+    // Adiciona padding se fornecido
+
     if (widget.padding != null) {
       checkbox = Padding(
         padding: widget.padding!,
@@ -123,7 +128,7 @@ class _AccessibleKeyboardCheckboxState extends State<AccessibleKeyboardCheckbox>
       );
     }
 
-    // Add tooltip if provided
+    // Adiciona o Tooltip se for lido
     if (widget.tooltip != null) {
       checkbox = Tooltip(
         message: widget.tooltip!,
@@ -131,14 +136,16 @@ class _AccessibleKeyboardCheckboxState extends State<AccessibleKeyboardCheckbox>
       );
     }
 
-    // Wrap in RawKeyboardListener for keyboard activation
+    // Envolve com RawKeyboardListener para ativação por teclado
+
     checkbox = RawKeyboardListener(
       focusNode: _focusNode,
       onKey: _handleKeyDown,
       child: checkbox,
     );
 
-    // Wrap in Semantics for accessibility information
+    // Envolve com Semantics para informações de acessibilidade
+
     return Semantics(
       label: widget.semanticsLabel,
       enabled: widget.enabled,

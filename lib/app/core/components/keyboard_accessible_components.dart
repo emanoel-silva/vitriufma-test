@@ -5,7 +5,7 @@ import 'package:vitrine_ufma/app/core/components/vlibras_clickable_text.dart';
 import 'package:vitrine_ufma/app/core/services/keyboard_navigation_service.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
-/// Enhanced button with keyboard navigation support
+/// Botão aprimorado com suporte a navegação por teclado
 class KeyboardAccessibleButton extends StatefulWidget {
   final Widget child;
   final VoidCallback? onPressed;
@@ -107,7 +107,7 @@ class _KeyboardAccessibleButtonState extends State<KeyboardAccessibleButton> {
   }
 }
 
-/// Enhanced text field with keyboard navigation support
+/// Campo de texto aprimorado com suporte a navegação por teclado
 class KeyboardAccessibleTextField extends StatefulWidget {
   final TextEditingController? controller;
   final String? labelText;
@@ -208,7 +208,7 @@ class _KeyboardAccessibleTextFieldState extends State<KeyboardAccessibleTextFiel
   }
 }
 
-/// Enhanced clickable text with keyboard navigation support
+/// Texto clicável aprimorado com suporte a navegação por teclado
 class KeyboardAccessibleText extends StatefulWidget {
   final String text;
   final TextStyle? style;
@@ -366,7 +366,7 @@ class _KeyboardAccessibleTextState extends State<KeyboardAccessibleText> {
   }
 }
 
-/// Enhanced link widget with keyboard navigation support
+/// Widget de link aprimorado com suporte a navegação por teclado
 class KeyboardAccessibleLink extends StatelessWidget {
   final String text;
   final String route;
@@ -407,18 +407,18 @@ class KeyboardAccessibleLink extends StatelessWidget {
   }
 
   void _navigateToRoute() {
-    // Handle both internal routes and external URLs
+    // Manipula tanto rotas internas quanto URLs externas
     if (route.startsWith('http')) {
-      // External URL - would need url_launcher package
-      // For now, just show a message
+      // URL externa - precisaria do pacote url_launcher
+      // Por enquanto, apenas mostra uma mensagem
       return;
     } else {
-      // Internal route
+      // Rota interna
       if (route.startsWith('/')) {
-        // Absolute route
+        // Rota absoluta
         Modular.to.navigate(route);
       } else {
-        // Relative route
+        // Rota relativa
         Modular.to.pushNamed(route);
       }
     }

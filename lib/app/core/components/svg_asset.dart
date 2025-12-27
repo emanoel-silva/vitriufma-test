@@ -18,11 +18,13 @@ class AppSvgAsset extends StatelessWidget {
     this.imageH = 30,
     this.color,
     this.altText,
-    this.enableZoom = false, // SVGs typically don't need zooming
+
+    this.enableZoom = false, // SVGs normalmente não precisam de zoom
   }) : super(key: key);
 
   String _getDefaultAltText(String image) {
-    // Provide descriptive alt text based on SVG icon name
+
+    // Fornece texto alternativo descritivo com base no nome do ícone SVG
     switch (image.toLowerCase().replaceAll('.svg', '')) {
       case 'book':
         return 'Ícone de livro';

@@ -3,25 +3,25 @@ import 'package:flutter/services.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:vitrine_ufma/app/core/components/vlibras_clickable_text.dart';
 
-/// An accessible image zoom component that displays images in a modal dialog
-/// when clicked/tapped, with smooth transitions and full keyboard support.
+/// Um componente de zoom de imagem acessível que exibe imagens em um diálogo modal
+/// quando clicado/tocado, com transições suaves e suporte completo a teclado.
 class AccessibleImageZoom extends StatefulWidget {
-  /// The image asset path
+  /// O caminho do asset da imagem
   final String image;
 
-  /// Optional alt text for accessibility
+  /// Texto alternativo opcional para acessibilidade
   final String? altText;
 
-  /// Optional width for the image
+  /// Largura opcional para a imagem
   final double? width;
 
-  /// Optional height for the image
+  /// Altura opcional para a imagem
   final double? height;
 
-  /// Optional fit for the image
+  /// Ajuste opcional para a imagem
   final BoxFit? fit;
 
-  /// Enable VLibras translation for alt text
+  /// Habilita tradução VLibras para texto alternativo
   final bool enableVLibras;
 
   const AccessibleImageZoom({
@@ -111,7 +111,7 @@ class _AccessibleImageZoomState extends State<AccessibleImageZoom> {
       ),
     );
     
-    // Add VLibras support for alt text if enabled and on web
+    // Adiciona suporte VLibras para texto alternativo se habilitado e na web
     if (widget.enableVLibras && UniversalPlatform.isWeb) {
       return VLibrasClickableWrapper(
         textToTranslate: resolvedAltText,
@@ -161,10 +161,10 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
     super.initState();
     _dialogFocusNode = FocusNode();
     WidgetsBinding.instance.addObserver(this);
-    // Request focus when dialog opens for keyboard accessibility
+    // Solicita foco quando o diálogo abre para acessibilidade por teclado
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _dialogFocusNode.requestFocus();
-      // Set initial scale based on screen size for better responsiveness
+      // Define escala inicial com base no tamanho da tela para melhor responsividade
       _calculateInitialScale();
     });
   }
@@ -172,7 +172,7 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    // Recalculate scale when screen metrics change (orientation, etc.)
+    // Recalcula a escala quando as métricas da tela mudam (orientação, etc.)
     if (mounted) {
       _calculateInitialScale();
     }
@@ -183,16 +183,18 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
     final currentScreenSize = mediaQuery.size;
     final currentOrientation = mediaQuery.orientation;
     
-    // Only recalculate if screen size or orientation changed
+    // Recalcular somente se o tamanho ou a orientação da tela forem alterados.
     if (_screenSize != currentScreenSize || _orientation != currentOrientation) {
       _screenSize = currentScreenSize;
       _orientation = currentOrientation;
       
-      // Set initial scale to 1.0 (normal scale)
+      // Defina a escala inicial para 1,0 (escala normal).
       _initialScale = 1.0;
       
-      // Apply the scale
+
+      // Aplica a escala
       _transformationController.value = Matrix4.identity()..scale(_initialScale);
+
     }
   }
 
@@ -209,7 +211,7 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
     Widget dialogWidget = Focus(
       focusNode: _dialogFocusNode,
       onKeyEvent: (node, event) {
-        // Close dialog when ESC is pressed
+        // Fecha o diálogo quando ESC é pressionado
         if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
           widget.onClose();
           return KeyEventResult.handled;
@@ -229,11 +231,11 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
                   final screenSize = mediaQuery.size;
                   final orientation = mediaQuery.orientation;
                   
-                  // Calculate responsive constraints based on screen size
+                  // Calcula as restrições responsivas com base no tamanho da tela
                   double maxWidth = screenSize.width * 0.9;
                   double maxHeight = screenSize.height * 0.9;
                   
-                  // Adjust constraints based on orientation
+                  // Ajusta as restrições com base na orientação
                   if (orientation == Orientation.portrait) {
                     maxHeight = screenSize.height * 0.85;
                     maxWidth = screenSize.width * 0.95;
@@ -242,11 +244,11 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
                     maxWidth = screenSize.width * 0.7;
                   }
                   
-                  // Ensure minimum size for very small screens
+                  // Garante tamanho mínimo para telas muito pequenas
                   final minWidth = screenSize.width * 0.4;
                   final minHeight = screenSize.height * 0.4;
                   
-                  // For mobile devices, use more restrictive sizing
+                  // Para dispositivos móveis, use dimensionamento mais restritivo
                   if (screenSize.width < 600) {
                     maxWidth = screenSize.width * 0.95;
                     maxHeight = screenSize.height * 0.7;
@@ -266,9 +268,10 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
                       transformationController: _transformationController,
                       boundaryMargin: EdgeInsets.all(orientation == Orientation.portrait ? 10 : 20),
                       minScale: 0.1,
-                      maxScale: 10, // Keep max scale for zooming capabilities
+
+                      maxScale: 10, // Mantém escala máxima para capacidades de zoom
                       onInteractionEnd: (details) {
-                        // Reset scale when double tapping
+                        // Redefine a escala quando tocado duas vezes
                         if (details.pointerCount == 1) {
                           final scale = _transformationController.value.getMaxScaleOnAxis();
                           if (scale > 1.0) {
@@ -294,7 +297,7 @@ class _ZoomDialogState extends State<_ZoomDialog> with WidgetsBindingObserver {
       ),
     );
     
-    // Add VLibras support for alt text if enabled and on web
+    // Adiciona suporte VLibras para texto alternativo se habilitado e na web
     if (widget.enableVLibras && UniversalPlatform.isWeb) {
       return VLibrasClickableWrapper(
         textToTranslate: widget.altText ?? 'Imagem ampliável',

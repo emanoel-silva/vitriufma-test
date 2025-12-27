@@ -30,7 +30,7 @@ class AppImageAsset extends StatelessWidget {
   }) : super(key: key);
 
   String _getDefaultAltText(String image) {
-    // Provide descriptive alt text based on image name
+    // Fornece texto alternativo descritivo com base no nome da imagem
     switch (image.toLowerCase()) {
       case 'logo.png':
         return 'Logotipo da Vitrine Virtual';
@@ -45,7 +45,7 @@ class AppImageAsset extends StatelessWidget {
       case 'example-ps-scaled.jpg':
         return 'Imagem de exemplo da biblioteca';
       default:
-        // For book images and others, provide a generic description
+        // Para imagens de livros e outras, fornece uma descrição genérica
         if (image.contains('book')) {
           return 'Capa do livro';
         }
@@ -66,7 +66,7 @@ class AppImageAsset extends StatelessWidget {
         fit: fit,
       );
       
-      // Add VLibras support for alt text if enabled and on web
+      // Adiciona suporte VLibras para texto alternativo se habilitado e na web
       if (enableVLibrasAltText && UniversalPlatform.isWeb) {
         return VLibrasClickableWrapper(
           textToTranslate: resolvedAltText,
@@ -88,7 +88,7 @@ class AppImageAsset extends StatelessWidget {
         semanticLabel: resolvedAltText,
       );
       
-      // Add VLibras support for alt text if enabled and on web
+      // Adiciona suporte VLibras para texto alternativo se habilitado e na web
       if (enableVLibrasAltText && UniversalPlatform.isWeb) {
         return VLibrasClickableWrapper(
           textToTranslate: resolvedAltText,

@@ -58,7 +58,8 @@ class BookCard extends StatelessWidget {
                       );
                     },
                     errorBuilder: (context, error, stackTrace) {
-                      // Return a placeholder image or a custom error widget
+
+                      // Retorna uma imagem placeholder ou um widget de erro personalizado
                       return Center(
                         child: Icon(
                           Icons.error_outline,

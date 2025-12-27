@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// A widget that enhances keyboard navigation for its child content
-/// Supports all requested keyboard shortcuts:
-/// - Tab: Advance between interactive elements
-/// - Shift + Tab: Move focus backward
-/// - Enter: Activate links, buttons or submit forms
-/// - Space: Activate checkboxes, buttons or scroll page
-/// - Arrow keys (↑↓←→): Navigate menus, lists or controls
-/// - Esc: Close menus or modals
+/// Um widget que aprimora a navegação por teclado para o conteúdo filho
+/// Suporta todos os atalhos de teclado solicitados:
+/// - Tab: Avança entre elementos interativos
+/// - Shift + Tab: Move o foco para trás
+/// - Enter: Ativa links, botões ou submete formulários
+/// - Espaço: Ativa caixas de seleção, botões ou rola a página
+/// - Teclas de seta (↑↓←→): Navega por menus, listas ou controles
+/// - Esc: Fecha menus ou modais
 class EnhancedKeyboardNavigation extends StatefulWidget {
   final Widget child;
   final ScrollController? scrollController;
@@ -35,7 +35,7 @@ class _EnhancedKeyboardNavigationState extends State<EnhancedKeyboardNavigation>
     super.initState();
     _scrollController = widget.scrollController ?? ScrollController();
     
-    // Request focus after the widget is built
+    // Solicita foco após o widget ser construído
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
@@ -44,7 +44,7 @@ class _EnhancedKeyboardNavigationState extends State<EnhancedKeyboardNavigation>
   @override
   void dispose() {
     _focusNode.dispose();
-    // Only dispose if we created the controller
+    // Apenas descarta se criamos o controlador
     if (widget.scrollController == null) {
       _scrollController.dispose();
     }
@@ -53,11 +53,11 @@ class _EnhancedKeyboardNavigationState extends State<EnhancedKeyboardNavigation>
 
   void _handleKeyEvent(RawKeyEvent event) {
     if (event is RawKeyDownEvent) {
-      // Handle scrolling with space key when not on a focusable element
+      // Manipula rolagem com a tecla de espaço quando não está em um elemento focalizável
       if (event.logicalKey == LogicalKeyboardKey.space && 
           !event.isKeyPressed(LogicalKeyboardKey.shift) &&
           FocusManager.instance.primaryFocus?.context?.widget is! EditableText) {
-        // Scroll down by 100 pixels
+        // Rola para baixo em 100 pixels
         _scrollController.animateTo(
           _scrollController.offset + 100,
           duration: const Duration(milliseconds: 100),
@@ -66,24 +66,24 @@ class _EnhancedKeyboardNavigationState extends State<EnhancedKeyboardNavigation>
         return;
       }
 
-      // Handle arrow key events for scrolling (when not in a text field)
+      // Manipula eventos de teclas de seta para rolagem (quando não está em um campo de texto)
       if (FocusManager.instance.primaryFocus?.context?.widget is! EditableText) {
         if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-          // Scroll up by 100 pixels
+          // Rola para cima em 100 pixels
           _scrollController.animateTo(
             _scrollController.offset - 100,
             duration: const Duration(milliseconds: 100),
             curve: Curves.linear,
           );
         } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-          // Scroll down by 100 pixels
+          // Rola para baixo em 100 pixels
           _scrollController.animateTo(
             _scrollController.offset + 100,
             duration: const Duration(milliseconds: 100),
             curve: Curves.linear,
           );
         } else if (event.logicalKey == LogicalKeyboardKey.pageUp) {
-          // Page up - scroll up by 80% of screen height
+          // Page up - rola para cima em 80% da altura da tela
           final screenHeight = MediaQuery.of(context).size.height;
           _scrollController.animateTo(
             _scrollController.offset - screenHeight * 0.8,
@@ -91,7 +91,7 @@ class _EnhancedKeyboardNavigationState extends State<EnhancedKeyboardNavigation>
             curve: Curves.easeInOut,
           );
         } else if (event.logicalKey == LogicalKeyboardKey.pageDown) {
-          // Page down - scroll down by 80% of screen height
+          // Page down - rola para baixo em 80% da altura da tela
           final screenHeight = MediaQuery.of(context).size.height;
           _scrollController.animateTo(
             _scrollController.offset + screenHeight * 0.8,
@@ -99,14 +99,14 @@ class _EnhancedKeyboardNavigationState extends State<EnhancedKeyboardNavigation>
             curve: Curves.easeInOut,
           );
         } else if (event.logicalKey == LogicalKeyboardKey.home) {
-          // Home key - scroll to top
+          // Tecla Home - rola para o topo
           _scrollController.animateTo(
             0,
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
           );
         } else if (event.logicalKey == LogicalKeyboardKey.end) {
-          // End key - scroll to bottom
+          // Tecla End - rola para o final
           _scrollController.animateTo(
             _scrollController.position.maxScrollExtent,
             duration: const Duration(milliseconds: 300),
@@ -115,12 +115,12 @@ class _EnhancedKeyboardNavigationState extends State<EnhancedKeyboardNavigation>
         }
       }
 
-      // Handle Escape key
+      // Manipula a tecla Escape
       if (event.logicalKey == LogicalKeyboardKey.escape) {
-        // Call the escape callback if provided
+        // Chama o callback de escape se fornecido
         widget.onEscapePressed?.call();
         
-        // Also try to close any open dialogs or popups
+        // Também tenta fechar quaisquer diálogos ou pop-ups abertos
         Navigator.maybePop(context);
       }
     }

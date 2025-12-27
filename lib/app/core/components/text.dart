@@ -54,7 +54,7 @@ class AppText extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeCustom theme = Theme.of(context).extension<ThemeCustom>()!;
     
-    // Create the text style
+    // Cria o estilo do texto
     final textStyleConfig = textStyle(
         color: color ?? theme.textColor,
         overflow: TextOverflow.ellipsis,
@@ -67,7 +67,7 @@ class AppText extends StatelessWidget {
         decorationThickness: decorationThickness,
         letterSpacing: letterSpacing);
     
-    // Create the base text widget
+    // Cria o widget de texto base
     Widget textWidget = Container(
       color: Colors.transparent,
       child: EasyRichText(
@@ -99,9 +99,9 @@ class AppText extends StatelessWidget {
       ),
     );
     
-    // Add text to NVDA queue if enabled and on web
+    // Adiciona texto à fila do NVDA se habilitado e na web
     if (enableNVDA && UniversalPlatform.isWeb) {
-      // Add text to NVDA helper queue when widget is built
+      // Adiciona texto à fila do helper do NVDA quando o widget é construído
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (NVDAHelper.isAreaVisible) {
           NVDAHelper.addTextToQueue(text);
@@ -109,7 +109,7 @@ class AppText extends StatelessWidget {
       });
     }
     
-    // If VLibras is enabled and we're on web, wrap with VLibrasClickableWrapper
+    // Se o VLibras estiver habilitado e estivermos na web, envolve com VLibrasClickableWrapper
     if (enableVLibras && UniversalPlatform.isWeb) {
       return VLibrasClickableWrapper(
         textToTranslate: text,

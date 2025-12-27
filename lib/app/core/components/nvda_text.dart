@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
 import '../utils/nvda_helper_stub.dart' if (dart.library.html) '../utils/nvda_helper.dart';
 
-/// Widget that makes text available for NVDA screen reader
-/// When enableNVDA is true, the text content can be included in the NVDA text box
-/// when the box is active. The widget itself does not create or remove the NVDA box.
+/// Widget que torna o texto disponível para o leitor de tela NVDA
+/// Quando enableNVDA é verdadeiro, o conteúdo de texto pode ser incluído na caixa de texto do NVDA
+/// quando a caixa está ativa. O widget em si não cria ou remove a caixa NVDA.
 class NVDAText extends StatefulWidget {
   final String text;
   final TextStyle? style;
@@ -32,16 +32,16 @@ class NVDAText extends StatefulWidget {
 class _NVDATextState extends State<NVDAText> {
   @override
   Widget build(BuildContext context) {
-    // Add text to NVDA area if enabled and on web platform
+    // Adiciona texto à área do NVDA se habilitado e na plataforma web
     if (widget.enableNVDA && UniversalPlatform.isWeb && NVDAHelper.isAreaVisible) {
-      // The NVDAHelper will manage the text content when the area is visible
-      // We don't need to do anything here as the helper already handles this
+      // O NVDAHelper gerenciará o conteúdo de texto quando a área estiver visível
+      // Não precisamos fazer nada aqui, pois o helper já lida com isso
     }
 
-    // Create semantic text for screen readers
+    // Cria texto semântico para leitores de tela
     return Semantics(
       label: widget.semanticsLabel ?? widget.text,
-      liveRegion: true, // This makes the text available for screen readers immediately
+      liveRegion: true, // Isso torna o texto disponível imediatamente para leitores de tela
       child: Text(
         widget.text,
         style: widget.style,
@@ -53,7 +53,7 @@ class _NVDATextState extends State<NVDAText> {
   }
 }
 
-/// Widget that wraps any child widget and makes its text content available for NVDA
+/// Widget que envolve qualquer widget filho e torna seu conteúdo de texto disponível para o NVDA
 class NVDATextWrapper extends StatefulWidget {
   final Widget child;
   final String textToRead;
@@ -75,12 +75,12 @@ class NVDATextWrapper extends StatefulWidget {
 class _NVDATextWrapperState extends State<NVDATextWrapper> {
   @override
   Widget build(BuildContext context) {
-    // Add text to NVDA area if enabled and on web platform
+    // Adiciona texto à área do NVDA se habilitado e na plataforma web
     if (widget.enableNVDA && UniversalPlatform.isWeb && NVDAHelper.isAreaVisible) {
-      // The NVDAHelper will manage the text content when the area is visible
+      // O NVDAHelper gerenciará o conteúdo de texto quando a área estiver visível
     }
 
-    // Wrap child with semantic information
+    // Envelopa o filho com informações semânticas
     return Semantics(
       label: widget.semanticsLabel ?? widget.textToRead,
       liveRegion: true,
@@ -89,23 +89,23 @@ class _NVDATextWrapperState extends State<NVDATextWrapper> {
   }
 }
 
-/// Mixin for pages that want to contribute content to NVDA
+/// Mixin para páginas que desejam contribuir com conteúdo para o NVDA
 mixin NVDAPageMixin<T extends StatefulWidget> on State<T> {
-  /// Updates the NVDA text area with new content
-  /// Only works when the NVDA area is already visible
+  /// Atualiza a área de texto do NVDA com novo conteúdo
+  /// Só funciona quando a área do NVDA já está visível
   void updateNVDAText(String text) {
     if (UniversalPlatform.isWeb && NVDAHelper.isAreaVisible) {
-      // The NVDAHelper manages the text content
+      // O NVDAHelper gerencia o conteúdo de texto
       // In a real implementation, we might want to queue or combine text
     }
   }
 
-  /// Reads text immediately with NVDA
-  /// This creates a temporary area that auto-closes
+  /// Lê o texto imediatamente com o NVDA
+  /// Isso cria uma área temporária que se fecha automaticamente
   void readWithNVDA(String text) {
     if (UniversalPlatform.isWeb) {
       NVDAHelper.createNVDAArea(text);
-      // Auto-remove after a short delay to avoid cluttering the screen
+      // Remove automaticamente após um curto intervalo para evitar poluir a tela
       Future.delayed(const Duration(seconds: 10), () {
         if (NVDAHelper.isAreaVisible) {
           NVDAHelper.removeNVDAArea();

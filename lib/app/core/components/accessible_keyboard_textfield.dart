@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/semantics.dart';
 
-/// An accessible text field that properly handles all keyboard interactions
-/// Supports:
-/// - All standard text field keyboard interactions
-/// - Proper focus management
-/// - Screen reader announcements
-/// - Custom keyboard shortcuts
+/// Um campo de texto acessível que manipula corretamente todas as interações de teclado
+/// Suporta:
+/// - Todas as interações de teclado padrão de campo de texto
+/// - Gerenciamento adequado de foco
+/// - Anúncios para leitores de tela
+/// - Atalhos de teclado personalizados
 class AccessibleKeyboardTextField extends StatefulWidget {
   final String? value;
   final ValueChanged<String>? onChanged;
@@ -103,7 +103,7 @@ class _AccessibleKeyboardTextFieldState extends State<AccessibleKeyboardTextFiel
       _isFocused = _focusNode.hasFocus;
     });
     
-    // Announce focus changes to screen readers
+    // Anuncia mudanças de foco para leitores de tela
     if (_isFocused && widget.semanticsLabel != null) {
       SemanticsService.announce('${widget.semanticsLabel} focado', TextDirection.ltr);
     }
@@ -117,11 +117,11 @@ class _AccessibleKeyboardTextFieldState extends State<AccessibleKeyboardTextFiel
 
   void _handleKeyDown(RawKeyEvent event) {
     if (event is RawKeyDownEvent) {
-      // Handle custom keyboard shortcuts
+      // Manipula atalhos de teclado personalizados
       final isCtrlPressed = event.isKeyPressed(LogicalKeyboardKey.controlLeft) || 
                           event.isKeyPressed(LogicalKeyboardKey.controlRight);
       
-      // Ctrl+A to select all
+      // Ctrl+A para selecionar tudo
       if (isCtrlPressed && event.logicalKey == LogicalKeyboardKey.keyA) {
         _controller.selection = TextSelection(
           baseOffset: 0,
@@ -129,13 +129,13 @@ class _AccessibleKeyboardTextFieldState extends State<AccessibleKeyboardTextFiel
         );
       }
       
-      // Ctrl+C, Ctrl+X, Ctrl+V are handled by the system
+      // Ctrl+C, Ctrl+X, Ctrl+V são manipulados pelo sistema
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Create the text field widget
+    // Cria o widget do campo de texto
     Widget textField = TextField(
       controller: _controller,
       focusNode: _focusNode,
@@ -159,7 +159,7 @@ class _AccessibleKeyboardTextFieldState extends State<AccessibleKeyboardTextFiel
       onSubmitted: widget.onSubmitted,
     );
 
-    // Add padding if provided
+    // Adiciona preenchimento se fornecido
     if (widget.padding != null) {
       textField = Padding(
         padding: widget.padding!,
@@ -167,14 +167,14 @@ class _AccessibleKeyboardTextFieldState extends State<AccessibleKeyboardTextFiel
       );
     }
 
-    // Wrap in RawKeyboardListener for custom keyboard shortcuts
+    // Envolve em RawKeyboardListener para atalhos de teclado personalizados
     textField = RawKeyboardListener(
       focusNode: _focusNode,
       onKey: _handleKeyDown,
       child: textField,
     );
 
-    // Wrap in Semantics for accessibility information
+    // Envolve em Semantics para informações de acessibilidade
     return Semantics(
       label: widget.semanticsLabel,
       hint: widget.hintText,

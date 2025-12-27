@@ -3,31 +3,31 @@ import 'package:flutter/services.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:vitrine_ufma/app/core/components/vlibras_clickable_text.dart';
 
-/// An accessible network image zoom component that displays images in a modal dialog
-/// when clicked/tapped, with smooth transitions and full keyboard support.
+/// Um componente de zoom de imagem de rede acessível que exibe imagens em um diálogo modal
+/// quando clicado/tocado, com transições suaves e suporte completo a teclado.
 class AccessibleNetworkImageZoom extends StatefulWidget {
-  /// The network image URL
+  /// A URL da imagem de rede
   final String imageUrl;
 
-  /// Optional alt text for accessibility
+  /// Texto alternativo opcional para acessibilidade
   final String? altText;
 
-  /// Optional width for the image
+  /// Largura opcional para a imagem
   final double? width;
 
-  /// Optional height for the image
+  /// Altura opcional para a imagem
   final double? height;
 
-  /// Optional fit for the image
+  /// Ajuste opcional para a imagem
   final BoxFit? fit;
 
-  /// Optional loading builder
+  /// Construtor opcional para carregamento
   final ImageLoadingBuilder? loadingBuilder;
 
-  /// Optional error builder
+  /// Construtor opcional para erro
   final ImageErrorWidgetBuilder? errorBuilder;
 
-  /// Enable VLibras translation for alt text
+  /// Habilita tradução VLibras para texto alternativo
   final bool enableVLibras;
 
   const AccessibleNetworkImageZoom({
@@ -123,7 +123,7 @@ class _AccessibleNetworkImageZoomState extends State<AccessibleNetworkImageZoom>
       ),
     );
     
-    // Add VLibras support for alt text if enabled and on web
+    // Adiciona suporte VLibras para texto alternativo se habilitado e na web
     if (widget.enableVLibras && UniversalPlatform.isWeb) {
       return VLibrasClickableWrapper(
         textToTranslate: resolvedAltText,
@@ -177,10 +177,10 @@ class _NetworkImageZoomDialogState extends State<_NetworkImageZoomDialog> with W
     super.initState();
     _dialogFocusNode = FocusNode();
     WidgetsBinding.instance.addObserver(this);
-    // Request focus when dialog opens for keyboard accessibility
+    // Solicita foco quando o diálogo abre para acessibilidade por teclado
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _dialogFocusNode.requestFocus();
-      // Set initial scale based on screen size for better responsiveness
+      // Define escala inicial com base no tamanho da tela para melhor responsividade
       _calculateInitialScale();
     });
   }
@@ -188,7 +188,7 @@ class _NetworkImageZoomDialogState extends State<_NetworkImageZoomDialog> with W
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    // Recalculate scale when screen metrics change (orientation, etc.)
+    // Recalcula a escala quando as métricas da tela mudam (orientação, etc.)
     if (mounted) {
       _calculateInitialScale();
     }
@@ -199,15 +199,15 @@ class _NetworkImageZoomDialogState extends State<_NetworkImageZoomDialog> with W
     final currentScreenSize = mediaQuery.size;
     final currentOrientation = mediaQuery.orientation;
     
-    // Only recalculate if screen size or orientation changed
+    // Apenas recalcula se o tamanho ou orientação da tela mudar
     if (_screenSize != currentScreenSize || _orientation != currentOrientation) {
       _screenSize = currentScreenSize;
       _orientation = currentOrientation;
       
-      // Set initial scale to 1.0 (normal scale)
+      // Define escala inicial para 1.0 (escala normal)
       _initialScale = 1.0;
       
-      // Apply the scale
+      // Aplica a escala
       _transformationController.value = Matrix4.identity()..scale(_initialScale);
     }
   }
@@ -225,7 +225,7 @@ class _NetworkImageZoomDialogState extends State<_NetworkImageZoomDialog> with W
     Widget dialogWidget = Focus(
       focusNode: _dialogFocusNode,
       onKeyEvent: (node, event) {
-        // Close dialog when ESC is pressed
+        // Fecha o diálogo quando ESC é pressionado
         if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
           widget.onClose();
           return KeyEventResult.handled;
@@ -241,11 +241,11 @@ class _NetworkImageZoomDialogState extends State<_NetworkImageZoomDialog> with W
             child: Center(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  // Calculate responsive constraints based on screen size
+                  // Calcula as restrições responsivas com base no tamanho da tela
                   final maxWidth = constraints.maxWidth * 0.9;
                   final maxHeight = constraints.maxHeight * 0.9;
                   
-                  // Ensure minimum size for very small screens
+                  // Garante tamanho mínimo para telas muito pequenas
                   final minWidth = MediaQuery.of(context).size.width * 0.5;
                   final minHeight = MediaQuery.of(context).size.height * 0.5;
                   
@@ -260,9 +260,9 @@ class _NetworkImageZoomDialogState extends State<_NetworkImageZoomDialog> with W
                       transformationController: _transformationController,
                       boundaryMargin: const EdgeInsets.all(20),
                       minScale: 0.5,
-                      maxScale: 10, // Keep max scale for zooming capabilities
+                      maxScale: 10, // Mantém escala máxima para capacidades de zoom
                       onInteractionEnd: (details) {
-                        // Reset scale when double tapping
+                        // Redefine a escala quando tocado duas vezes
                         if (details.pointerCount == 1) {
                           final scale = _transformationController.value.getMaxScaleOnAxis();
                           if (scale > 1.0) {
@@ -272,10 +272,10 @@ class _NetworkImageZoomDialogState extends State<_NetworkImageZoomDialog> with W
                       },
                       child: Image.network(
                         widget.imageUrl,
-                        // Ignore width/height passed from parent for modal view
+                        // Ignora largura/altura passada do pai para visualização modal
                         // width: widget.width,
                         // height: widget.height,
-                        fit: BoxFit.contain, // Ensure it fits the screen
+                        fit: BoxFit.contain, // Garante que se encaixe na tela
                         loadingBuilder: widget.loadingBuilder,
                         errorBuilder: widget.errorBuilder,
                         filterQuality: FilterQuality.high,
@@ -291,7 +291,7 @@ class _NetworkImageZoomDialogState extends State<_NetworkImageZoomDialog> with W
       ),
     );
     
-    // Add VLibras support for alt text if enabled and on web
+    // Adiciona suporte VLibras para texto alternativo se habilitado e na web
     if (widget.enableVLibras && UniversalPlatform.isWeb) {
       return VLibrasClickableWrapper(
         textToTranslate: widget.altText ?? 'Imagem ampliável',

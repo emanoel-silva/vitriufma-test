@@ -27,7 +27,8 @@ class TextWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Create the base text widget
+    // Cria o widget de texto base
+
     Widget textWidget = Text(
       text,
       maxLines: maxLines ?? 1,
@@ -38,7 +39,8 @@ class TextWidget extends StatelessWidget {
           color: color ?? Colors.black),
     );
     
-    // If there's an onTap callback, wrap with GestureDetector
+    // Se houver um callback onTap, envolva com GestureDetector
+
     if (onTap != null) {
       textWidget = GestureDetector(
         onTap: onTap,
@@ -46,7 +48,8 @@ class TextWidget extends StatelessWidget {
       );
     }
     
-    // If VLibras is enabled and we're on web, wrap with VLibrasClickableWrapper
+    // Se o VLibras estiver habilitado e estivermos na web, envolva com VLibrasClickableWrapper
+
     if (enableVLibras && UniversalPlatform.isWeb) {
       return VLibrasClickableWrapper(
         textToTranslate: text,

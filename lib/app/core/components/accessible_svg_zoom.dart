@@ -3,22 +3,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:vitrine_ufma/app/core/utils/screen_helper.dart';
 
-/// An accessible SVG zoom component that displays SVG images in a modal dialog
-/// when clicked/tapped, with smooth transitions and full keyboard support.
+/// Um componente de zoom SVG acessível que exibe imagens SVG em um diálogo modal
+/// quando clicado/tocado, com transições suaves e suporte completo a teclado.
 class AccessibleSvgZoom extends StatefulWidget {
-  /// The SVG image asset path
+  /// O caminho do asset da imagem SVG
   final String image;
 
-  /// Optional alt text for accessibility
+  /// Texto alternativo opcional para acessibilidade
   final String? altText;
 
-  /// Optional width for the image
+  /// Largura opcional para a imagem
   final double? width;
 
-  /// Optional height for the image
+  /// Altura opcional para a imagem
   final double? height;
 
-  /// Optional color for the SVG
+  /// Cor opcional para o SVG
   final Color? color;
 
   const AccessibleSvgZoom({
@@ -140,10 +140,10 @@ class _SvgZoomDialogState extends State<_SvgZoomDialog> with WidgetsBindingObser
     super.initState();
     _dialogFocusNode = FocusNode();
     WidgetsBinding.instance.addObserver(this);
-    // Request focus when dialog opens for keyboard accessibility
+    // Solicita foco quando o diálogo abre para acessibilidade por teclado
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _dialogFocusNode.requestFocus();
-      // Set initial scale based on screen size for better responsiveness
+      // Define escala inicial com base no tamanho da tela para melhor responsividade
       _calculateInitialScale();
     });
   }
@@ -151,7 +151,7 @@ class _SvgZoomDialogState extends State<_SvgZoomDialog> with WidgetsBindingObser
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    // Recalculate scale when screen metrics change (orientation, etc.)
+    // Recalcula a escala quando as métricas da tela mudam (orientação, etc.)
     if (mounted) {
       _calculateInitialScale();
     }
@@ -162,15 +162,15 @@ class _SvgZoomDialogState extends State<_SvgZoomDialog> with WidgetsBindingObser
     final currentScreenSize = mediaQuery.size;
     final currentOrientation = mediaQuery.orientation;
     
-    // Only recalculate if screen size or orientation changed
+    // Apenas recalcula se o tamanho ou orientação da tela mudar
     if (_screenSize != currentScreenSize || _orientation != currentOrientation) {
       _screenSize = currentScreenSize;
       _orientation = currentOrientation;
       
-      // Set initial scale to 1.0 (normal scale)
+      // Define escala inicial para 1.0 (escala normal)
       _initialScale = 1.0;
       
-      // Apply the scale
+      // Aplica a escala
       _transformationController.value = Matrix4.identity()..scale(_initialScale);
     }
   }
@@ -188,7 +188,7 @@ class _SvgZoomDialogState extends State<_SvgZoomDialog> with WidgetsBindingObser
     return Focus(
       focusNode: _dialogFocusNode,
       onKeyEvent: (node, event) {
-        // Close dialog when ESC is pressed
+        // Fecha o diálogo quando ESC é pressionado
         if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
           widget.onClose();
           return KeyEventResult.handled;
@@ -204,11 +204,11 @@ class _SvgZoomDialogState extends State<_SvgZoomDialog> with WidgetsBindingObser
             child: Center(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  // Calculate responsive constraints based on screen size
+                  // Calcula as restrições responsivas com base no tamanho da tela
                   final maxWidth = constraints.maxWidth * 0.9;
                   final maxHeight = constraints.maxHeight * 0.9;
                   
-                  // Ensure minimum size for very small screens
+                  // Garante tamanho mínimo para telas muito pequenas
                   final minWidth = MediaQuery.of(context).size.width * 0.5;
                   final minHeight = MediaQuery.of(context).size.height * 0.5;
                   
@@ -223,9 +223,9 @@ class _SvgZoomDialogState extends State<_SvgZoomDialog> with WidgetsBindingObser
                       transformationController: _transformationController,
                       boundaryMargin: const EdgeInsets.all(20),
                       minScale: 0.5,
-                      maxScale: 10, // Keep max scale for zooming capabilities
+                      maxScale: 10, // Mantém escala máxima para capacidades de zoom
                       onInteractionEnd: (details) {
-                        // Reset scale when double tapping
+                        // Redefine a escala quando tocado duas vezes
                         if (details.pointerCount == 1) {
                           final scale = _transformationController.value.getMaxScaleOnAxis();
                           if (scale > 1.0) {

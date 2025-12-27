@@ -46,17 +46,17 @@ class _VLibrasClickableTextState extends State<VLibrasClickableText> {
   }
 
   void _handleMouseEnter() {
-    // Cancel any existing timer
+    // Cancela qualquer timer existente
     _hoverTimer?.cancel();
     
-    // Start a new timer for 3 seconds
+    // Inicia um novo timer de 3 segundos
     _hoverTimer = Timer(Duration(seconds: 3), () {
       _handleHover();
     });
   }
 
   void _handleMouseExit() {
-    // Cancel the timer if mouse leaves before 3 seconds
+    // Cancela o timer se o mouse sair antes de 3 segundos
     _hoverTimer?.cancel();
   }
 
@@ -65,7 +65,7 @@ class _VLibrasClickableTextState extends State<VLibrasClickableText> {
       if (VLibrasHelper.isAvailable) {
         VLibrasHelper.activateAndTranslate(widget.text);
       } else {
-        // Se VLibras não estiver disponível, cria área de feedback
+        // Se o VLibras não estiver disponível, cria área de feedback
         VLibrasHelper.createTranslationArea(widget.text);
       }
     } catch (e) {
@@ -76,7 +76,7 @@ class _VLibrasClickableTextState extends State<VLibrasClickableText> {
   @override
   Widget build(BuildContext context) {
     if (!UniversalPlatform.isWeb) {
-      // Em plataformas não-web, retorna apenas o texto normal
+      // Em plataformas que não são web, retorna apenas o texto normal
       return Text(
         widget.text,
         style: widget.style,
@@ -86,7 +86,7 @@ class _VLibrasClickableTextState extends State<VLibrasClickableText> {
       );
     }
 
-    // Remove the Tooltip wrapper to eliminate the legend that accompanies the cursor
+    // Remove o wrapper Tooltip para eliminar a legenda que acompanha o cursor
     return MouseRegion(
       onEnter: (event) => _handleMouseEnter(),
       onExit: (event) => _handleMouseExit(),
@@ -141,7 +141,7 @@ class VLibrasClickableWrapper extends StatefulWidget {
     this.padding,
     this.highlightColor,
     this.tooltip,
-    this.showFeedback = false, // Changed default to false to disable notifications
+    this.showFeedback = false, // Alterado o padrão para falso para desativar notificações
   }) : super(key: key);
 
   @override
@@ -158,17 +158,17 @@ class _VLibrasClickableWrapperState extends State<VLibrasClickableWrapper> {
   }
 
   void _handleMouseEnter(BuildContext context) {
-    // Cancel any existing timer
+    // Cancela qualquer timer existente
     _hoverTimer?.cancel();
     
-    // Start a new timer for 3 seconds
+    // Inicia um novo timer de 3 segundos
     _hoverTimer = Timer(Duration(seconds: 3), () {
       _handleHover(context);
     });
   }
 
   void _handleMouseExit() {
-    // Cancel the timer if mouse leaves before 3 seconds
+    // Cancela o timer se o mouse sair antes de 3 segundos
     _hoverTimer?.cancel();
   }
 
@@ -190,7 +190,7 @@ class _VLibrasClickableWrapperState extends State<VLibrasClickableWrapper> {
       return widget.child;
     }
 
-    // Remove the Tooltip wrapper to eliminate the legend that accompanies the cursor
+    // Remove o wrapper Tooltip para eliminar a legenda que acompanha o cursor
     return MouseRegion(
       onEnter: (event) => _handleMouseEnter(context),
       onExit: (event) => _handleMouseExit(),
